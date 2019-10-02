@@ -395,7 +395,22 @@ Polygon::~Polygon()
 
 Yin Yin::inverse()
 {
-	return Yin();
+	Yin null;
+	intersect(null);
+	list<list<Point>> out;
+	cut(out);
+	for (list<list<Point>>::iterator i = out.begin(); i != out.end(); i++) {
+		list<Point> buf = *i;
+		i->clear();
+		while (!buf.empty())
+		{
+			i->push_back(*buf.rbegin());
+			buf.pop_back();
+		}
+	}
+	Yin res(out);
+	res.sign =sign^ true;
+	return res;
 }
 
 Yin Yin::meet(Yin& rhs)
@@ -414,12 +429,17 @@ Yin Yin::meet(Yin& rhs)
 		if (interiorTest(testp) || onTest(testp))
 			fin.push_back(*i);
 	}
-	return Yin(fin);
+	Yin res(fin);
+	res.sign = sign && rhs.sign;
+	return res;
 }
 
 Yin Yin::join(Yin& rhs)
 {
-	return Yin();
+	Yin rl = inverse();
+	Yin rr = rhs.inverse();
+	Yin rres = rl.meet(rr);
+	return rres.inverse();
 }
 
 void Yin::intersect(Yin& obj)//功能：进行多边形相交算法，获得非连接点交点，并插入原数据集合
@@ -571,7 +591,7 @@ bool Yin::interiorTest(Point c)
 		bool b = i->interiorTest(c);
 		res ^= b;
 	}
-	return res;
+	return res^sign;
 }
 
 bool Yin::onTest(Point c)
@@ -669,7 +689,9 @@ Yin::Yin(list<list<Point>>& segments)
 					break;
 				}
 
-				for (list<list<Point>*>::iterator it = sobo.begin(); it != sobo.end(); it++)
+				beta = *sobo.begin();
+				bool minarg = atan2();
+				for (list<list<Point>*>::iterator it = ++sobo.begin(); it != sobo.end(); it++)
 				{
 					beta = *it;
 				}

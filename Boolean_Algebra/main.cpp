@@ -29,8 +29,8 @@ int main()
 	}
 	for (int i = 0; i < N; i++) {
 		double arg = (i * 2.0 + 1) / N * 3.1415;
-		rg[i].x = 220 + (80) * cos(arg);
-		rg[i].y = 200 + (80) * sin(arg);
+		rg[i].x = 230 + (160) * cos(arg);
+		rg[i].y = 200 + (50) * sin(arg);
 	}
 	/*pg[0] = Point(100,100);
 	pg[1] = Point(200, 100);
@@ -57,10 +57,11 @@ int main()
 
 	//list<list<Point>> out;
 	//Y1.cut(out);
+	//Yin Y4 = Y2.inverse();
 	Yin Y3 = Y1.meet(Y2);
-	drawYin(img, Y1,0);
+	//drawYin(img, Y1,0);
 	//drawYin(img, Y2,0);
-	drawYin(img, Y3,1);
+	drawYin(img, Y3,0);
 
 	for (map<Point, vector<Line>>::iterator i = info.begin(); i != info.end(); i++) {
 		drawPoint(img, i->first);
