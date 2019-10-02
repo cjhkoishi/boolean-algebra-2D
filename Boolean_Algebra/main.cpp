@@ -2,7 +2,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#define N 40
+#define N 4
 
 void drawPoint(cv::Mat img, Point P);
 void drawLine(cv::Mat img, Line L);
@@ -17,33 +17,35 @@ int main()
 
 	Point pg[N], qg[N], rg[N];
 	map<Point, vector<Line>> info;
-	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0+1) / N * 3.1415;
+	/*for (int i = 0; i < N; i++) {
+		double arg = (i * 2.0) / N * 3.1415926;
 		pg[i].x = 200 + (100) * cos(arg);
 		pg[i].y = 200 + (100) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
-		double arg = -(i * 2.0 + 1) / N * 3.1415;
-		qg[i].x = 200 + (70) * cos(arg);
+		double arg = (i * 2.0) / N * 3.1415926;
+		qg[i].x = 370 + (70) * cos(arg);
 		qg[i].y = 200 + (70) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
 		double arg = (i * 2.0 + 1) / N * 3.1415;
-		rg[i].x = 230 + (160) * cos(arg);
-		rg[i].y = 200 + (50) * sin(arg);
-	}
-	/*pg[0] = Point(100,100);
+		rg[i].x = 230 + (80 + 40 * cos(arg * 4)) * cos(arg);
+		rg[i].y = 200 + (80 + 40 * cos(arg * 4)) * sin(arg);
+	}*/
+	pg[0] = Point(100,100);
 	pg[1] = Point(200, 100);
 	pg[2] = Point(200, 200);
 	pg[3] = Point(100, 200);
-	qg[0] = Point(125, 125);
-	qg[1] = Point(125, 175);
-	qg[2] = Point(175, 175);
-	qg[3] = Point(175, 125);
+
+	qg[0] = Point(200, 200);
+	qg[1] = Point(300, 200);
+	qg[2] = Point(300, 300);
+	qg[3] = Point(200, 300);
+
 	rg[0] = Point(120, 90);
 	rg[1] = Point(200, 90);
 	rg[2] = Point(200, 210);
-	rg[3] = Point(120, 210);*/
+	rg[3] = Point(120, 210);
 
 	Polygon PL1(pg, N);
 	Polygon PL2(qg, N);
@@ -57,11 +59,11 @@ int main()
 
 	//list<list<Point>> out;
 	//Y1.cut(out);
-	//Yin Y4 = Y2.inverse();
-	Yin Y3 = Y1.meet(Y2);
-	//drawYin(img, Y1,0);
+	Yin Y4 = Y1.inverse();
+	//Yin Y3 = Y1.meet(Y2);
+	drawYin(img, Y4,0);
 	//drawYin(img, Y2,0);
-	drawYin(img, Y3,0);
+	//drawYin(img, Y3, 0);
 
 	for (map<Point, vector<Line>>::iterator i = info.begin(); i != info.end(); i++) {
 		drawPoint(img, i->first);

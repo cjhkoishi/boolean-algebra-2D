@@ -1,4 +1,6 @@
+#define PI 3.14159265358
 #include "bool_alg.h"
+
 
 struct PointInfo {
 	list<Line> U;
@@ -409,7 +411,7 @@ Yin Yin::inverse()
 		}
 	}
 	Yin res(out);
-	res.sign =sign^ true;
+	res.sign = sign ^ true;
 	return res;
 }
 
@@ -591,7 +593,7 @@ bool Yin::interiorTest(Point c)
 		bool b = i->interiorTest(c);
 		res ^= b;
 	}
-	return res^sign;
+	return res ^ sign;
 }
 
 bool Yin::onTest(Point c)
@@ -659,7 +661,7 @@ Yin::Yin(list<list<Point>>& segments)
 
 	while (true) {
 		map<Point, SegmentInfo>::iterator t = si.begin();
-		while (t!=si.end()) {
+		while (t != si.end()) {
 			if (!t->second.O.empty())
 				break;
 			t++;
@@ -671,14 +673,14 @@ Yin::Yin(list<list<Point>>& segments)
 		spadjor.push_front(Polygon());
 		list<Polygon>::iterator Jor = spadjor.begin();
 		Point start;
-		list<Point>::iterator current=beta->begin();
+		list<Point>::iterator current = beta->begin();
 		start = *current;
 		bool flag = true;
 
 		do {
 			Jor->append(*current);
 			current++;
-			if (current==beta->end()) {
+			if (current == beta->end()) {
 				si[*beta->begin()].O.remove(beta);
 				si[*beta->rbegin()].I.remove(beta);
 				list<list<Point>*>& sobo = si[*beta->rbegin()].O;
@@ -688,20 +690,29 @@ Yin::Yin(list<list<Point>>& segments)
 					spadjor.pop_front();
 					break;
 				}
-
+				//working
+				Point Ivec = *beta->rbegin() - *(++beta->rbegin());
 				beta = *sobo.begin();
-				bool minarg = atan2();
+				Point Ovec = *(++beta->begin()) - *beta->begin();
+				double Iarg = atan2(Ivec.y, Ivec.x);
+				double Oarg = atan2(Ovec.y, Ovec.x);
+				double minArg = Oarg - Iarg - 2 * PI * (int)((Oarg - Iarg) / (2 * PI));
 				for (list<list<Point>*>::iterator it = ++sobo.begin(); it != sobo.end(); it++)
 				{
-					beta = *it;
+					Ovec = *(++(*it)->begin()) - *(*it)->begin();
+					Oarg = atan2(Ovec.y, Ovec.x);
+					double arg = Oarg - Iarg - 2 * PI * (int)((Oarg - Iarg) / (2 * PI));
+					if (arg < minArg) {
+						minArg = arg;
+						beta = *it;
+					}
 				}
-
 				current = ++(beta->begin());
 			}
 
-		}while(!(*current==start));
+		} while (!(*current == start));
 		if (!flag) {
-			
+
 			continue;
 		}
 		si[*beta->begin()].O.remove(beta);
