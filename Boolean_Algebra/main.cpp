@@ -2,7 +2,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-#define N 4
+#define N 40
 
 void drawPoint(cv::Mat img, Point P);
 void drawLine(cv::Mat img, Line L);
@@ -17,7 +17,7 @@ int main()
 
 	Point pg[N], qg[N], rg[N];
 	map<Point, vector<Line>> info;
-	/*for (int i = 0; i < N; i++) {
+	for (int i = 0; i < N; i++) {
 		double arg = (i * 2.0+1) / N * 3.1415;
 		pg[i].x = 200 + (100) * cos(arg);
 		pg[i].y = 200 + (100) * sin(arg);
@@ -31,8 +31,8 @@ int main()
 		double arg = (i * 2.0 + 1) / N * 3.1415;
 		rg[i].x = 220 + (80) * cos(arg);
 		rg[i].y = 200 + (80) * sin(arg);
-	}*/
-	pg[0] = Point(100,100);
+	}
+	/*pg[0] = Point(100,100);
 	pg[1] = Point(200, 100);
 	pg[2] = Point(200, 200);
 	pg[3] = Point(100, 200);
@@ -43,7 +43,7 @@ int main()
 	rg[0] = Point(120, 90);
 	rg[1] = Point(200, 90);
 	rg[2] = Point(200, 210);
-	rg[3] = Point(120, 210);
+	rg[3] = Point(120, 210);*/
 
 	Polygon PL1(pg, N);
 	Polygon PL2(qg, N);

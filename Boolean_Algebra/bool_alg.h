@@ -63,6 +63,8 @@ public:
 	bool interiorTest(Point c);//判断点是否在多边形内部。符号相关
 	void cut(list<list<Vertex*>>& out);//根据相交标签切割多边形为若干折线段
 
+	void append(Point c);
+
 	Polygon();
 	Polygon(Point* pg, int n);
 	Polygon(const Polygon& obj);
@@ -73,6 +75,7 @@ class Yin //Yin集类
 {
 public:
 	list<Polygon> spadjor;
+	bool sign = false;
 
 	Yin inverse();
 	Yin meet(Yin& rhs);      

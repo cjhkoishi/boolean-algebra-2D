@@ -320,6 +320,24 @@ void Polygon::cut(list<list<Vertex*>>& out)
 {
 }
 
+void Polygon::append(Point c)
+{
+	if (head == 0) {
+		head = new Vertex();
+		head->p = c;
+		head->next = head;
+		head->last = head;
+	}
+	else {
+		Vertex* v = new Vertex();
+		v->p = c;
+		v->next = head;
+		v->last = head->last;
+		head->last->next = v;
+		head->last = v;
+	}
+}
+
 Polygon::Polygon()
 {
 }
@@ -619,48 +637,56 @@ Yin::Yin(list<list<Point>>& segments)
 		si[*i->rbegin()].I.push_back(&*i);
 	}
 
-	while (!si.empty()) {
-		list<Point>* beta = *si.begin()->second.O.begin();//当前折线段
-		list<Point>::iterator s = beta->begin();//顶点遍历
-		Point ls = *s, m = *s;//折线段起点 初始点
+	while (true) {
+		map<Point, SegmentInfo>::iterator t = si.begin();
+		while (t!=si.end()) {
+			if (!t->second.O.empty())
+				break;
+			t++;
+		}
+		if (t == si.end())
+			return;
+
+		list<Point>* beta = *t->second.O.begin();
 		spadjor.push_front(Polygon());
-		list<Polygon>::iterator J = spadjor.begin();//被构造的目标多边形
-		Polygon::Vertex** v = &J->head;//被修改的向前指针
+		list<Polygon>::iterator Jor = spadjor.begin();
+		Point start;
+		list<Point>::iterator current=beta->begin();
+		start = *current;
+		bool flag = true;
+
 		do {
-			*v = new Polygon::Vertex();
-			(*v)->p = *s;
-			v = &(*v)->next;
-			if (si.find(*s) != si.end())//若是分界点
-			{
-				si[*s].I.remove(beta);
-				si[ls].O.remove(beta);
-				if (si[*s].O.size() + si[*s].I.size() == 0)
-					si.erase(*s);
-				if (si[ls].O.size() + si[ls].I.size() == 0)
-					si.erase(ls);
-				SegmentInfo currentsi = si[*s];
-				double minarg;//working
-				for (list<list<Point>*>::iterator j = currentsi.O.begin(); j != currentsi.O.end(); j++) {
-					beta = *j;
+			Jor->append(*current);
+			current++;
+			if (current==beta->end()) {
+				si[*beta->begin()].O.remove(beta);
+				si[*beta->rbegin()].I.remove(beta);
+				list<list<Point>*>& sobo = si[*beta->rbegin()].O;
+				if (sobo.empty())
+				{
+					flag = false;
+					spadjor.pop_front();
+					break;
 				}
-				s = beta->begin();
-				ls = *s;
+
+				for (list<list<Point>*>::iterator it = sobo.begin(); it != sobo.end(); it++)
+				{
+					beta = *it;
+				}
+
+				current = ++(beta->begin());
 			}
-			s++;
-		} while (!(*s == m));
-		si[*s].I.remove(beta);
-		si[ls].O.remove(beta);
-		if (si[*s].O.size() + si[*s].I.size() == 0)
-			si.erase(*s);
-		if (si[ls].O.size() + si[ls].I.size() == 0)
-			si.erase(ls);
-		*v = J->head;
-		Polygon::Vertex* fix = J->head;
-		do {
-			fix->next->last = fix;
-			fix = fix->next;
-		} while (fix != J->head);
+
+		}while(!(*current==start));
+		if (!flag) {
+			
+			continue;
+		}
+		si[*beta->begin()].O.remove(beta);
+		si[*beta->rbegin()].I.remove(beta);
+
 	}
+
 }
 
 Yin::~Yin()
