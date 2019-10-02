@@ -75,7 +75,7 @@ public:
 	list<Polygon> spadjor;
 
 	Yin inverse();
-	Yin meet(Yin& rhs);
+	Yin meet(Yin& rhs);      
 	Yin join(Yin& rhs);
 
 	void intersect(Yin& obj);
