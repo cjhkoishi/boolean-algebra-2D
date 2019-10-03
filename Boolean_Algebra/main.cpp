@@ -7,7 +7,7 @@
 void drawPoint(cv::Mat img, Point P);
 void drawLine(cv::Mat img, Line L);
 void drawPolygon(cv::Mat img, Polygon PL);
-void drawYin(cv::Mat img, Yin Y, int mode);
+void drawYin(cv::Mat img, Yin& Y, int mode);
 
 cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
@@ -33,14 +33,14 @@ int main()
 		rg[i].y = 200 + (80 + 40 * cos(arg * 4)) * sin(arg);
 	}*/
 	pg[0] = Point(100,100);
-	pg[1] = Point(200, 100);
-	pg[2] = Point(200, 200);
-	pg[3] = Point(100, 200);
+	pg[1] = Point(200, 200);
+	pg[2] = Point(100, 300);
+	pg[3] = Point(150, 200);
 
-	qg[0] = Point(200, 200);
-	qg[1] = Point(300, 200);
-	qg[2] = Point(300, 300);
-	qg[3] = Point(200, 300);
+	qg[0] = Point(100, 100);
+	qg[1] = Point(50, 200);
+	qg[2] = Point(100, 300);
+	qg[3] = Point(0, 200);
 
 	rg[0] = Point(120, 90);
 	rg[1] = Point(200, 90);
@@ -61,6 +61,7 @@ int main()
 	//Y1.cut(out);
 	Yin Y4 = Y1.inverse();
 	//Yin Y3 = Y1.meet(Y2);
+	//Y4.spadjor.pop_back();
 	drawYin(img, Y4,0);
 	//drawYin(img, Y2,0);
 	//drawYin(img, Y3, 0);
@@ -95,7 +96,7 @@ void drawPolygon(cv::Mat img, Polygon PL)
 
 }
 
-void drawYin(cv::Mat img, Yin Y, int mode)
+void drawYin(cv::Mat img, Yin& Y, int mode)
 {
 	if (mode == 1)
 		for (int i = 0; i < img.rows; i++) {

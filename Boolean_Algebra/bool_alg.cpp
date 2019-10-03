@@ -8,6 +8,7 @@ struct PointInfo {
 	list<Line> C;
 };
 void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q);
+double mod(double a,double b);
 
 Point Point::operator+(const Point rhs) const
 {
@@ -156,6 +157,14 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 			}
 		}
 	}
+}
+
+double mod(double a, double b)
+{
+	while (!(a < b/2 && a >= -b/2)) {
+		a += a >= b/2 ? -b : b;
+	}
+	return a;
 }
 
 Point Line::E;
@@ -367,6 +376,7 @@ Polygon::Polygon(const Polygon& obj)
 	if (obj.head != 0) {
 		head = new Vertex();
 		head->p = obj.head->p;
+		head->isMarked = obj.head->isMarked;
 		Vertex* i = obj.head->next;
 		Vertex* k = head;
 		while (obj.head != i) {
@@ -696,13 +706,13 @@ Yin::Yin(list<list<Point>>& segments)
 				Point Ovec = *(++beta->begin()) - *beta->begin();
 				double Iarg = atan2(Ivec.y, Ivec.x);
 				double Oarg = atan2(Ovec.y, Ovec.x);
-				double minArg = Oarg - Iarg - 2 * PI * (int)((Oarg - Iarg) / (2 * PI));
+				double minArg = mod(Oarg-Iarg,2*PI);
 				for (list<list<Point>*>::iterator it = ++sobo.begin(); it != sobo.end(); it++)
 				{
 					Ovec = *(++(*it)->begin()) - *(*it)->begin();
 					Oarg = atan2(Ovec.y, Ovec.x);
 					double arg = Oarg - Iarg - 2 * PI * (int)((Oarg - Iarg) / (2 * PI));
-					if (arg < minArg) {
+					if (arg > minArg) {
 						minArg = arg;
 						beta = *it;
 					}
