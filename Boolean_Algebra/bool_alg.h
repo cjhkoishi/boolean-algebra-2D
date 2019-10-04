@@ -57,13 +57,15 @@ public:
 		bool isMarked;
 	};
 	Vertex* head = 0;//指向双向链表起始节点
-	bool sign = false;//多边形的符号。注：当顶点集不空时，与多边形的绕向一致
+	bool orientation = false;//多边形的符号。注：当顶点集不空时，与多边形的绕向一致
 
 	void intersect(Polygon& polygon, map<Point, vector<Line>>& info);//与另一多边形求交点，标记，并插入原多边形
 	bool interiorTest(Point c);//判断点是否在多边形内部。符号相关
 	void cut(list<list<Vertex*>>& out);//根据相交标签切割多边形为若干折线段
 
 	void append(Point c);
+
+	void refreshSign();
 
 	Polygon();
 	Polygon(Point* pg, int n);
@@ -85,6 +87,7 @@ public:
 	bool interiorTest(Point c);
 	bool onTest(Point c);
 	void cut(list<list<Point>>& out);
+	void getBettiNum(int& b0,int& b1);
 
 	Yin();
 	Yin(list<list<Point>>& segment);

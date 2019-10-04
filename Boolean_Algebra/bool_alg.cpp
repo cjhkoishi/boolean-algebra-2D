@@ -8,7 +8,7 @@ struct PointInfo {
 	list<Line> C;
 };
 void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q);
-double mod(double a,double b);
+double mod(double a, double b);
 
 Point Point::operator+(const Point rhs) const
 {
@@ -161,8 +161,8 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 
 double mod(double a, double b)
 {
-	while (!(a < b/2 && a >= -b/2)) {
-		a += a >= b/2 ? -b : b;
+	while (!(a < b / 2 && a >= -b / 2)) {
+		a += a >= b / 2 ? -b : b;
 	}
 	return a;
 }
@@ -303,7 +303,7 @@ bool Polygon::interiorTest(Point c)
 {
 	Vertex* i = head;
 	if (i == 0) {
-		return sign;
+		return orientation;
 	}
 	int cn = 0;
 	do {
@@ -349,6 +349,24 @@ void Polygon::append(Point c)
 	}
 }
 
+void Polygon::refreshSign()
+{
+	if (head == 0)
+		orientation = true;
+	else {
+		Vertex* i = head;
+		Vertex* sidePoint = head;
+		do {
+			if (i->p < sidePoint->p)
+				sidePoint = i;
+			i = i->next;
+		} while (i != head);
+		Point v1 = sidePoint->p - sidePoint->last->p;
+		Point v2 = sidePoint->next->p - sidePoint->p;
+		orientation = v1.cross(v2) > 0;
+	}
+}
+
 Polygon::Polygon()
 {
 }
@@ -374,6 +392,7 @@ Polygon::Polygon(Point* pg, int n)
 Polygon::Polygon(const Polygon& obj)
 {
 	if (obj.head != 0) {
+		orientation = obj.orientation;
 		head = new Vertex();
 		head->p = obj.head->p;
 		head->isMarked = obj.head->isMarked;
@@ -653,6 +672,18 @@ void Yin::cut(list<list<Point>>& out)
 	}
 }
 
+void Yin::getBettiNum(int& b0, int& b1)
+{
+	b0 = sign;
+	b1 = 0;
+	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end();i++) {
+		if (i->orientation)
+			b0++;
+		else
+			b1++;
+	}
+}
+
 Yin::Yin()
 {
 }
@@ -706,7 +737,7 @@ Yin::Yin(list<list<Point>>& segments)
 				Point Ovec = *(++beta->begin()) - *beta->begin();
 				double Iarg = atan2(Ivec.y, Ivec.x);
 				double Oarg = atan2(Ovec.y, Ovec.x);
-				double minArg = mod(Oarg-Iarg,2*PI);
+				double minArg = mod(Oarg - Iarg, 2 * PI);
 				for (list<list<Point>*>::iterator it = ++sobo.begin(); it != sobo.end(); it++)
 				{
 					Ovec = *(++(*it)->begin()) - *(*it)->begin();
@@ -727,7 +758,7 @@ Yin::Yin(list<list<Point>>& segments)
 		}
 		si[*beta->begin()].O.remove(beta);
 		si[*beta->rbegin()].I.remove(beta);
-
+		Jor->refreshSign();
 	}
 
 }
