@@ -108,7 +108,7 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 			}
 		}
 	else {
-		for (list<Polygon>::iterator i = Y.spadjor.begin(); i != Y.spadjor.end(); i++) {
+		for (auto i = Y.spadjor.begin(); i != Y.spadjor.end(); i++) {
 			Polygon::Vertex* j = i->head;
 			do {
 				drawLine(img, Line(j->p, j->next->p));
@@ -151,7 +151,7 @@ void slideBar(int val, void*)
 	Y1.spadjor.push_back(PL2);
 	Y2.spadjor.push_back(PL3);
 	//Yin Y4 = Y2.inverse();
-	Yin Y3 = Y1.join(Y2);
+	Yin Y3 = Y1.meet(Y2);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2, 0);
 	drawYin(img, Y3, 0);

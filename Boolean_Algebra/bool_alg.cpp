@@ -66,7 +66,7 @@ void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections
 {
 	map<Point, PointInfo> Q;
 	set<Line> T;
-	for (list<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+	for (auto i = lines.begin(); i != lines.end(); i++) {
 		Point* upper, * lower;
 		if (i->Q < i->P) {
 			upper = &i->P;
@@ -92,19 +92,19 @@ void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections
 			intersections[p].insert(intersections[p].end(), pi.L.begin(), pi.L.end());
 			intersections[p].insert(intersections[p].end(), pi.U.begin(), pi.U.end());
 		}
-		for (list<Line>::iterator i = pi.L.begin(); i != pi.L.end(); i++)
+		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
+		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.erase(*i);
 		Line::E = p;
-		for (list<Line>::iterator i = pi.U.begin(); i != pi.U.end(); i++)
+		for (auto i = pi.U.begin(); i != pi.U.end(); i++)
 			T.insert(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
+		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
 		if (pi.U.empty() && pi.C.empty())
 		{
-			set<Line>::iterator sl = T.begin();
-			set<Line>::iterator sr = T.begin();
+			auto sl = T.begin();
+			auto sr = T.begin();
 			T.insert(*pi.L.begin());
 			sl = sr = T.find(*pi.L.begin());
 			sl--;
@@ -118,12 +118,12 @@ void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections
 			set<Line> UC;
 			UC.insert(pi.U.begin(), pi.U.end());
 			UC.insert(pi.C.begin(), pi.C.end());
-			set<Line>::iterator i_smin = T.find(*UC.begin());
-			set<Line>::iterator i_smax = T.find(*UC.rbegin());
+			auto i_smin = T.find(*UC.begin());
+			auto i_smax = T.find(*UC.rbegin());
 			Line smin = *i_smin;
 			Line smax = *i_smax;
-			set<Line>::iterator sl = --i_smin;
-			set<Line>::iterator sr = ++i_smax;
+			auto sl = --i_smin;
+			auto sr = ++i_smax;
 			if (sl != T.end())
 				findNextEvent(*sl, smin, p, Q);
 			if (sr != T.end())
@@ -340,7 +340,7 @@ Yin Yin::inverse()
 	intersect(null);
 	list<list<Point>> out;
 	cut(out);
-	for (list<list<Point>>::iterator i = out.begin(); i != out.end(); i++) {
+	for (auto i = out.begin(); i != out.end(); i++) {
 		list<Point> buf = *i;
 		i->clear();
 		while (!buf.empty())
@@ -361,7 +361,7 @@ Yin Yin::meet(Yin& rhs)
 	intersect(rhs);
 	cut(out1);
 	rhs.cut(out2);
-	for (list<list<Point>>::iterator i = out1.begin(); i != out1.end(); i++) {
+	for (auto i = out1.begin(); i != out1.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
 		Point testp = 0.5 * (c + d);
@@ -370,7 +370,7 @@ Yin Yin::meet(Yin& rhs)
 		if (isInterior || isCoincide)
 			fin.push_back(*i);
 	}
-	for (list<list<Point>>::iterator i = out2.begin(); i != out2.end(); i++) {
+	for (auto i = out2.begin(); i != out2.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
 		Point testp = 0.5 * (c + d);
@@ -405,7 +405,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 
 	//ππ‘Ïœﬂ∂Œ¡¥±Ì
 	list<Line> lines;
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* ii = i->head;
 		do {
 			Line l(ii->p, ii->next->p);
@@ -414,7 +414,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			ii = ii->next;
 		} while (ii != i->head);
 	}
-	for (list<Polygon>::iterator i = obj.spadjor.begin(); i != obj.spadjor.end(); i++) {
+	for (auto i = obj.spadjor.begin(); i != obj.spadjor.end(); i++) {
 		Polygon::Vertex* ii = i->head;
 		do {
 			Line l(ii->p, ii->next->p);
@@ -429,7 +429,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 	map<Point, PointInfo> intersections;//Ωªµ„=>À˘ Ùœﬂ∂Œ ”≥…‰
 	map<Point, PointInfo> Q;
 	set<Line> T;
-	for (list<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
+	for (auto i = lines.begin(); i != lines.end(); i++) {
 		Point* upper, * lower;
 		if (i->Q < i->P) {
 			upper = &i->P;
@@ -456,19 +456,19 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 		{
 			intersections[p] = pi;
 		}
-		for (list<Line>::iterator i = pi.L.begin(); i != pi.L.end(); i++)
+		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
+		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.erase(*i);
 		Line::E = p;
-		for (list<Line>::iterator i = pi.U.begin(); i != pi.U.end(); i++)
+		for (auto i = pi.U.begin(); i != pi.U.end(); i++)
 			T.insert(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
+		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
 		if (pi.U.empty() && pi.C.empty())
 		{
-			set<Line>::iterator sl = T.begin();
-			set<Line>::iterator sr = T.begin();
+			auto sl = T.begin();
+			auto sr = T.begin();
 			T.insert(*pi.L.begin());
 			sl = sr = T.find(*pi.L.begin());
 			sl--;
@@ -482,12 +482,12 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			set<Line> UC;
 			UC.insert(pi.U.begin(), pi.U.end());
 			UC.insert(pi.C.begin(), pi.C.end());
-			set<Line>::iterator i_smin = T.find(*UC.begin());
-			set<Line>::iterator i_smax = T.find(*UC.rbegin());
+			auto i_smin = T.find(*UC.begin());
+			auto i_smax = T.find(*UC.rbegin());
 			Line smin = *i_smin;
 			Line smax = *i_smax;
-			set<Line>::iterator sl = --i_smin;
-			set<Line>::iterator sr = ++i_smax;
+			auto sl = --i_smin;
+			auto sr = ++i_smax;
 			if (sl != T.end())
 				findNextEvent(*sl, smin, p, Q);
 			if (sr != T.end())
@@ -498,33 +498,33 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 
 	//≤Â»Î&±Íº«
 	map<Polygon::Vertex*, list<Point>> buffer;
-	for (map<Point, PointInfo>::iterator i = intersections.begin(); i != intersections.end(); i++) {
+	for (auto i = intersections.begin(); i != intersections.end(); i++) {
 		Point p = i->first;
 		PointInfo pi = i->second;
-		for (list<Line>::iterator j = pi.U.begin(); j != pi.U.end(); j++) {
+		for (auto j = pi.U.begin(); j != pi.U.end(); j++) {
 			if (j->P == p)
 				intersectTable[*j]->isMarked = true;
 			if (j->Q == p)
 				intersectTable[*j]->next->isMarked = true;
 		}
-		for (list<Line>::iterator j = pi.L.begin(); j != pi.L.end(); j++) {
+		for (auto j = pi.L.begin(); j != pi.L.end(); j++) {
 			if (j->P == p)
 				intersectTable[*j]->isMarked = true;
 			if (j->Q == p)
 				intersectTable[*j]->next->isMarked = true;
 		}
 
-		for (list<Line>::iterator j = pi.C.begin(); j != pi.C.end(); j++) {
+		for (auto j = pi.C.begin(); j != pi.C.end(); j++) {
 			buffer[intersectTable[*j]].push_back(p);
 		}
 	}
 
-	for (map<Polygon::Vertex*, list<Point>>::iterator i = buffer.begin(); i != buffer.end(); i++) {
+	for (auto i = buffer.begin(); i != buffer.end(); i++) {
 		list<Point>& np = i->second;
 		np.sort([&](Point& p1, Point& p2)->bool {Point s1 = p1 - i->first->p, s2 = p2 - i->first->p; return abs(s1.x) + abs(s1.y) < abs(s2.x) + abs(s2.y); });
 		Polygon::Vertex* start = i->first;
 		Polygon::Vertex* end = i->first->next;
-		for (list<Point>::iterator j = np.begin(); j != np.end(); j++) {
+		for (auto j = np.begin(); j != np.end(); j++) {
 			Polygon::Vertex* nv = new Polygon::Vertex();
 			nv->p = *j;
 			nv->next = end;
@@ -540,7 +540,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 bool Yin::interiorTest(Point c)
 {
 	bool res = false;
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		bool b = i->interiorTest(c);
 		res ^= b;
 	}
@@ -549,7 +549,7 @@ bool Yin::interiorTest(Point c)
 
 bool Yin::onTest(Point c, Point d)
 {
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* j = i->head;
 		do {
 			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) > 0)
@@ -563,7 +563,7 @@ bool Yin::onTest(Point c, Point d)
 void Yin::cut(list<list<Point>>& out)
 {
 	out.clear();
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* start = i->head;
 		if (start == 0)
 			continue;
@@ -580,7 +580,7 @@ void Yin::cut(list<list<Point>>& out)
 
 		Polygon::Vertex* it = start->next;
 		out.push_front(list<Point>());
-		list<list<Point>>::iterator linker = out.begin();
+		auto linker = out.begin();
 		linker->push_back(start->p);
 		do {
 			linker->push_back(it->p);
@@ -599,7 +599,7 @@ void Yin::getBettiNum(int& b0, int& b1)
 {
 	b0 = sign;
 	b1 = 0;
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		if (i->orientation)
 			b0++;
 		else
@@ -615,7 +615,7 @@ void Yin::append(Polygon PL)
 
 void Yin::clearLabel()
 {
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* j = i->head;
 		do {
 			j->isMarked = false;
@@ -635,13 +635,13 @@ Yin::Yin(list<list<Point>>& segments)
 		list<list<Point>*> I;
 	};
 	map<Point, SegmentInfo> si;
-	for (list<list<Point>>::iterator i = segments.begin(); i != segments.end(); i++) {
+	for (auto i = segments.begin(); i != segments.end(); i++) {
 		si[*i->begin()].O.push_back(&*i);
 		si[*i->rbegin()].I.push_back(&*i);
 	}
 
 	while (true) {
-		map<Point, SegmentInfo>::iterator t = si.begin();
+		auto t = si.begin();
 		while (t != si.end()) {
 			if (!t->second.O.empty())
 				break;
@@ -652,9 +652,9 @@ Yin::Yin(list<list<Point>>& segments)
 
 		list<Point>* beta = *t->second.O.begin();
 		spadjor.push_front(Polygon());
-		list<Polygon>::iterator Jor = spadjor.begin();
+		auto Jor = spadjor.begin();
 		Point start;
-		list<Point>::iterator current = beta->begin();
+		auto current = beta->begin();
 		start = *current;
 		bool flag = true;
 
@@ -678,7 +678,7 @@ Yin::Yin(list<list<Point>>& segments)
 				double Iarg = atan2(Ivec.y, Ivec.x);
 				double Oarg = atan2(Ovec.y, Ovec.x);
 				double minArg = mod(Oarg - Iarg, 2 * PI);
-				for (list<list<Point>*>::iterator it = ++sobo.begin(); it != sobo.end(); it++)
+				for (auto it = ++sobo.begin(); it != sobo.end(); it++)
 				{
 					Ovec = *(++(*it)->begin()) - *(*it)->begin();
 					Oarg = atan2(Ovec.y, Ovec.x);
