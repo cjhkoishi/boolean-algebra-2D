@@ -37,7 +37,7 @@ bool Point::operator<(const Point rhs) const
 
 bool Point::operator==(const Point rhs) const
 {
-	return (abs(x - rhs.x) < 1e-5) && (abs(y - rhs.y) < 1e-5);
+	return (abs(x - rhs.x) < 1e-8) && (abs(y - rhs.y) < 1e-8);
 }
 
 Point::Point() :x(0), y(0)
@@ -185,7 +185,7 @@ bool Line::operator<(const Line rhs) const
 		double k1 = (Q.x - P.x) / (P.y - Q.y);
 		double k2 = (rhs.Q.x - rhs.P.x) / (rhs.P.y - rhs.Q.y);
 		if (k1 != k2)
-			return k1 < k2;
+			return (E.x > M+2e-5) ^ (k1 < k2);
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}
@@ -362,13 +362,21 @@ Yin Yin::meet(Yin& rhs)
 	cut(out1);
 	rhs.cut(out2);
 	for (list<list<Point>>::iterator i = out1.begin(); i != out1.end(); i++) {
-		Point testp = 0.5 * (*i->begin() + *(++i->begin()));
-		if (rhs.interiorTest(testp) || rhs.onTest(testp))
+		Point c = *i->begin();
+		Point d = *(++i->begin());
+		Point testp = 0.5 * (c + d);
+		bool isInterior = rhs.interiorTest(testp);
+		bool isCoincide = rhs.onTest(c, d);
+		if (isInterior || isCoincide)
 			fin.push_back(*i);
 	}
 	for (list<list<Point>>::iterator i = out2.begin(); i != out2.end(); i++) {
-		Point testp = 0.5 * (*i->begin() + *(++i->begin()));
-		if (interiorTest(testp) || onTest(testp))
+		Point c = *i->begin();
+		Point d = *(++i->begin());
+		Point testp = 0.5 * (c + d);
+		bool isInterior = interiorTest(testp);
+		bool isCoincide = onTest(c, d);
+		if (isInterior && !isCoincide)
 			fin.push_back(*i);
 	}
 	Yin res(fin);
@@ -442,6 +450,7 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 		PointInfo pi = Q[p];
 		Q.erase(--Q.end());
 		//working
+
 
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
@@ -538,13 +547,14 @@ bool Yin::interiorTest(Point c)
 	return res ^ sign;
 }
 
-bool Yin::onTest(Point c)
+bool Yin::onTest(Point c, Point d)
 {
 	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* j = i->head;
 		do {
-			if (abs((j->p - c).cross(j->next->p - c)) < 1e-12)
+			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) > 0)
 				return true;
+			j = j->next;
 		} while (j != i->head);
 	}
 	return false;
@@ -589,7 +599,7 @@ void Yin::getBettiNum(int& b0, int& b1)
 {
 	b0 = sign;
 	b1 = 0;
-	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end();i++) {
+	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
 		if (i->orientation)
 			b0++;
 		else
@@ -610,7 +620,7 @@ void Yin::clearLabel()
 		do {
 			j->isMarked = false;
 			j = j->next;
-		} while (j!=i->head);
+		} while (j != i->head);
 	}
 }
 

@@ -81,7 +81,7 @@ public:
 
 	void intersect(Yin& obj);
 	bool interiorTest(Point c);
-	bool onTest(Point c);
+	bool onTest(Point c,Point d);
 	void cut(list<list<Point>>& out);
 	void getBettiNum(int& b0,int& b1);
 	void append(Polygon PL);

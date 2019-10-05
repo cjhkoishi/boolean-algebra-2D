@@ -30,9 +30,10 @@ int main()
 		qg[i].y = 200 + (50) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0 + 1) / N * 3.1415;
-		rg[i].x = 250 + (100 + 90 * cos(arg * 4)) * cos(arg);
-		rg[i].y = 200 + (100 + 90 * cos(arg * 4)) * sin(arg);
+		//double arg = (i * 2.0 + 1) / N * 3.1415;
+		double arg = (i * 2.0) / N * 3.1415926;
+		rg[i].x = 160 + (100 + 90 * cos(arg * 4)) * cos(arg);
+		rg[i].y = 160 + (100 + 90 * cos(arg * 4)) * sin(arg);
 	}
 	/*pg[0] = Point(100,100);
 	pg[1] = Point(200, 200);
@@ -62,13 +63,14 @@ int main()
 	//list<list<Point>> out;
 	//Y1.cut(out);
 	//Yin Y4 = Y1.inverse();
-	Yin Y3 = Y2.join(Y1);
+	Yin Y3 = Y1.meet(Y2);
 	//Y4.spadjor.pop_back();
 	//drawYin(img, Y4,0);
 	//drawYin(img, Y2, 0);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2,0);
-	drawYin(img, Y3, 0);
+	drawYin(img, Y1, 0);
+	drawYin(img, Y2, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
@@ -136,9 +138,9 @@ void slideBar(int val, void*)
 		qg[i].y = 200 + (50) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0 + 1) / N * 3.1415;
-		rg[i].x = 250 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * cos(arg);
-		rg[i].y = 200 + (val - 50) * 2+ (100 + 90 * cos(arg * 4)) * sin(arg);
+		double arg = (i * 2.0) / N * 3.1415926;
+		rg[i].x = 200 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * cos(arg);
+		rg[i].y = 200 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * sin(arg);
 	}
 
 	Polygon PL1(pg, N);
@@ -149,7 +151,9 @@ void slideBar(int val, void*)
 	Y1.spadjor.push_back(PL2);
 	Y2.spadjor.push_back(PL3);
 	//Yin Y4 = Y2.inverse();
-	Yin Y3 = Y2.join(Y1);
+	Yin Y3 = Y1.join(Y2);
+	//drawYin(img, Y1, 0);
+	//drawYin(img, Y2, 0);
 	drawYin(img, Y3, 0);
 	int b0, b1;
 	Y3.getBettiNum(b0,b1);
