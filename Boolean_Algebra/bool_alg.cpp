@@ -212,92 +212,6 @@ Line::~Line()
 {
 }
 
-void Polygon::intersect(Polygon& polygon, map<Point, vector<Line>>& intersections)
-{
-	list<Line>lines;
-
-	Vertex* ii = head, * jj = polygon.head;
-	do {
-		lines.push_back(Line(ii->p, ii->next->p));
-		ii = ii->next;
-	} while (ii != head);
-	do {
-		lines.push_back(Line(jj->p, jj->next->p));
-		jj = jj->next;
-	} while (jj != polygon.head);
-
-	map<Point, PointInfo> Q;
-	set<Line> T;
-	for (list<Line>::iterator i = lines.begin(); i != lines.end(); i++) {
-		Point* upper, * lower;
-		if (i->Q < i->P) {
-			upper = &i->P;
-			lower = &i->Q;
-		}
-		else {
-			upper = &i->Q;
-			lower = &i->P;
-		}
-		Q[*upper].U.push_back(*i);
-		Q[*upper].U.unique();
-		Q[*lower].L.push_back(*i);
-		Q[*upper].L.unique();
-	}
-	while (!Q.empty())
-	{
-		Point p = Q.rbegin()->first;
-		PointInfo pi = Q[p];
-		Q.erase(--Q.end());
-		//working
-
-		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
-		{
-			intersections[p].insert(intersections[p].end(), pi.C.begin(), pi.C.end());
-			intersections[p].insert(intersections[p].end(), pi.L.begin(), pi.L.end());
-			intersections[p].insert(intersections[p].end(), pi.U.begin(), pi.U.end());
-		}
-		for (list<Line>::iterator i = pi.L.begin(); i != pi.L.end(); i++)
-			T.erase(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
-			T.erase(*i);
-		Line::E = p;
-		for (list<Line>::iterator i = pi.U.begin(); i != pi.U.end(); i++)
-			T.insert(*i);
-		for (list<Line>::iterator i = pi.C.begin(); i != pi.C.end(); i++)
-			T.insert(*i);
-		if (pi.U.empty() && pi.C.empty())
-		{
-			set<Line>::iterator sl = T.begin();
-			set<Line>::iterator sr = T.begin();
-			T.insert(*pi.L.begin());
-			sl = sr = T.find(*pi.L.begin());
-			sl--;
-			sr++;
-			T.erase(*pi.L.begin());
-
-			if (sl != T.end() && sr != T.end())
-				findNextEvent(*sl, *sr, p, Q);
-		}
-		else {
-			set<Line> UC;
-			UC.insert(pi.U.begin(), pi.U.end());
-			UC.insert(pi.C.begin(), pi.C.end());
-			set<Line>::iterator i_smin = T.find(*UC.begin());
-			set<Line>::iterator i_smax = T.find(*UC.rbegin());
-			Line smin = *i_smin;
-			Line smax = *i_smax;
-			set<Line>::iterator sl = --i_smin;
-			set<Line>::iterator sr = ++i_smax;
-			if (sl != T.end())
-				findNextEvent(*sl, smin, p, Q);
-			if (sr != T.end())
-				findNextEvent(smax, *sr, p, Q);
-		}
-		//working
-	}
-
-
-}
 
 bool Polygon::interiorTest(Point c)
 {
@@ -325,10 +239,6 @@ bool Polygon::interiorTest(Point c)
 		i = i->next;
 	} while (i != head);
 	return abs(cn) % 2 == 1;
-}
-
-void Polygon::cut(list<list<Vertex*>>& out)
-{
 }
 
 void Polygon::append(Point c)
@@ -441,6 +351,7 @@ Yin Yin::inverse()
 	}
 	Yin res(out);
 	res.sign = sign ^ true;
+	//clearLabel();
 	return res;
 }
 
@@ -462,6 +373,8 @@ Yin Yin::meet(Yin& rhs)
 	}
 	Yin res(fin);
 	res.sign = sign && rhs.sign;
+	//clearLabel();
+	//rhs.clearLabel();
 	return res;
 }
 
@@ -681,6 +594,23 @@ void Yin::getBettiNum(int& b0, int& b1)
 			b0++;
 		else
 			b1++;
+	}
+}
+
+void Yin::append(Polygon PL)
+{
+	PL.refreshSign();
+	spadjor.push_back(PL);
+}
+
+void Yin::clearLabel()
+{
+	for (list<Polygon>::iterator i = spadjor.begin(); i != spadjor.end(); i++) {
+		Polygon::Vertex* j = i->head;
+		do {
+			j->isMarked = false;
+			j = j->next;
+		} while (j!=i->head);
 	}
 }
 

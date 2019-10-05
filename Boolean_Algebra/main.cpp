@@ -148,8 +148,8 @@ void slideBar(int val, void*)
 	Y1.spadjor.push_back(PL1);
 	Y1.spadjor.push_back(PL2);
 	Y2.spadjor.push_back(PL3);
-	Yin Y4 = Y2.inverse();
-	Yin Y3 = Y4.join(Y1);
+	//Yin Y4 = Y2.inverse();
+	Yin Y3 = Y2.join(Y1);
 	drawYin(img, Y3, 0);
 	int b0, b1;
 	Y3.getBettiNum(b0,b1);
