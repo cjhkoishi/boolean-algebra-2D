@@ -150,8 +150,8 @@ void slideBar(int val, void*)
 	Y1.spadjor.push_back(PL1);
 	Y1.spadjor.push_back(PL2);
 	Y2.spadjor.push_back(PL3);
-	//Yin Y4 = Y2.inverse();
-	Yin Y3 = Y1.meet(Y2);
+	Yin Y4 = Y1.inverse();
+	Yin Y3 = Y2.join(Y4);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2, 0);
 	drawYin(img, Y3, 0);

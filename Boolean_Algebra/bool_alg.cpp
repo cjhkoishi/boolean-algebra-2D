@@ -185,7 +185,7 @@ bool Line::operator<(const Line rhs) const
 		double k1 = (Q.x - P.x) / (P.y - Q.y);
 		double k2 = (rhs.Q.x - rhs.P.x) / (rhs.P.y - rhs.Q.y);
 		if (k1 != k2)
-			return (E.x > M+2e-5) ^ (k1 < k2);
+			return (E.x > M + 2e-5) ^ (k1 < k2);
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}
