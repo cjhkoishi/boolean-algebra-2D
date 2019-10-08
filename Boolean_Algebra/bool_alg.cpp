@@ -62,7 +62,7 @@ ostream& operator<<(ostream& out, const Point& p)
 	return out << "(" << p.x << "," << p.y << ")";
 }
 
-void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections)
+/*void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections)
 {
 	map<Point, PointInfo> Q;
 	set<Line> T;
@@ -132,14 +132,14 @@ void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections
 		//working
 
 	}
-}
+}*/
 
 void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	Point v = L1.Q - L1.P;
 	Point w = L2.Q - L2.P;
 	double cm = v.cross(w);
 	double err = 1e-6;
-	if (cm != 0)
+	if (abs(cm) > 1e-6)
 	{
 		double t = (L2.P - L1.P).cross(w) / cm;
 		double s = (L2.P - L1.P).cross(v) / cm;
@@ -259,7 +259,7 @@ void Polygon::append(Point c)
 	}
 }
 
-void Polygon::refreshSign()
+void Polygon::refreshOri()
 {
 	if (head == 0)
 		orientation = true;
@@ -351,7 +351,7 @@ Yin Yin::inverse()
 	}
 	Yin res(out);
 	res.sign = sign ^ true;
-	//clearLabel();
+	clearLabel();
 	return res;
 }
 
@@ -381,8 +381,8 @@ Yin Yin::meet(Yin& rhs)
 	}
 	Yin res(fin);
 	res.sign = sign && rhs.sign;
-	//clearLabel();
-	//rhs.clearLabel();
+	clearLabel();
+	rhs.clearLabel();
 	return res;
 }
 
@@ -609,7 +609,7 @@ void Yin::getBettiNum(int& b0, int& b1)
 
 void Yin::append(Polygon PL)
 {
-	PL.refreshSign();
+	PL.refreshOri();
 	spadjor.push_back(PL);
 }
 
@@ -677,14 +677,14 @@ Yin::Yin(list<list<Point>>& segments)
 				Point Ovec = *(++beta->begin()) - *beta->begin();
 				double Iarg = atan2(Ivec.y, Ivec.x);
 				double Oarg = atan2(Ovec.y, Ovec.x);
-				double minArg = mod(Oarg - Iarg, 2 * PI);
+				double maxArg = mod(Oarg - Iarg, 2 * PI);
 				for (auto it = ++sobo.begin(); it != sobo.end(); it++)
 				{
 					Ovec = *(++(*it)->begin()) - *(*it)->begin();
 					Oarg = atan2(Ovec.y, Ovec.x);
-					double arg = Oarg - Iarg - 2 * PI * (int)((Oarg - Iarg) / (2 * PI));
-					if (arg > minArg) {
-						minArg = arg;
+					double arg = mod(Oarg - Iarg, 2 * PI);
+					if (arg > maxArg) {
+						maxArg = arg;
 						beta = *it;
 					}
 				}
@@ -698,7 +698,7 @@ Yin::Yin(list<list<Point>>& segments)
 		}
 		si[*beta->begin()].O.remove(beta);
 		si[*beta->rbegin()].I.remove(beta);
-		Jor->refreshSign();
+		Jor->refreshOri();
 	}
 
 }

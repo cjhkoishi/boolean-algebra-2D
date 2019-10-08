@@ -37,9 +37,9 @@ public:
 	static Point E;//扫描线事件点，与操作符<的结果相关联
 
 	bool operator<(const Line rhs)const;//扫描线相关的序结构
-	bool operator==(const Line rhs)const;
+	bool operator==(const Line rhs)const;//无向意义下的相等比较
 
-	friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
+	//friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
 
 	Line();
 	Line(Point P, Point Q);
@@ -54,14 +54,14 @@ public:
 	{
 		Point p;
 		Vertex* next=0, * last=0;
-		bool isMarked;
+		bool isMarked;//是否是分割点
 	};
 	Vertex* head = 0;//指向双向链表起始节点
-	bool orientation = false;//多边形的绕向。注：当顶点集不空时，与多边形的绕向一致
+	bool orientation = false;//多边形的绕向，被动变量
 
 	bool interiorTest(Point c);//判断点是否在多边形内部。符号相关
-	void append(Point c);
-	void refreshSign();
+	void append(Point c);//在head顶点之前插入一个顶点
+	void refreshOri();//计算定向并刷新变量
 
 	Polygon();
 	Polygon(Point* pg, int n);
@@ -74,20 +74,20 @@ class Yin //Yin集类
 public:
 	list<Polygon> spadjor;
 	bool sign = false;
-
+	//布尔运算
 	Yin inverse();
 	Yin meet(Yin& rhs);      
 	Yin join(Yin& rhs);
 
-	void intersect(Yin& obj);
-	bool interiorTest(Point c);
-	bool onTest(Point c,Point d);
-	void cut(list<list<Point>>& out);
-	void getBettiNum(int& b0,int& b1);
-	void append(Polygon PL);
-	void clearLabel();
+	void intersect(Yin& obj);//求多边形集合的交点，并插入新交点数据
+	bool interiorTest(Point c);//Yin set的内部检测
+	bool onTest(Point c,Point d);//有向线段cd是否与多边形重合且同向
+	void cut(list<list<Point>>& out);//利用标记点分割成折线段
+	void getBettiNum(int& b0,int& b1);//计算betti数
+	void append(Polygon PL);//添加多边形
+	void clearLabel();//清空标记点的标记
 
 	Yin();
-	Yin(list<list<Point>>& segment);
+	Yin(list<list<Point>>& segment);//利用线段集合生成spadjor
 	~Yin();
 };

@@ -18,59 +18,42 @@ int main()
 {
 	srand(unsigned(time(0)));
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Point pg[N], qg[N], rg[N];
-	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0) / N * 3.1415926;
-		pg[i].x = 200 + (100 + 35 * cos(arg * 7)) * cos(arg);
-		pg[i].y = 200 + (100 + 35 * cos(arg * 5)) * sin(arg);
-	}
-	for (int i = 0; i < N; i++) {
-		double arg = -(i * 2.0) / N * 3.1415926;
-		qg[i].x = 200 + (50) * cos(arg);
-		qg[i].y = 200 + (50) * sin(arg);
-	}
-	for (int i = 0; i < N; i++) {
-		//double arg = (i * 2.0 + 1) / N * 3.1415;
-		double arg = (i * 2.0) / N * 3.1415926;
-		rg[i].x = 160 + (100 + 90 * cos(arg * 4)) * cos(arg);
-		rg[i].y = 160 + (100 + 90 * cos(arg * 4)) * sin(arg);
-	}
-	/*pg[0] = Point(100,100);
-	pg[1] = Point(200, 200);
-	pg[2] = Point(100, 300);
-	pg[3] = Point(150, 200);
+	Point pg[4], qg[4];
+	pg[0] = Point(200,100);
+	pg[1] = Point(300, 200);
+	pg[2] = Point(200, 300);
+	pg[3] = Point(250, 200);
 
-	qg[0] = Point(100, 100);
-	qg[1] = Point(50, 200);
-	qg[2] = Point(100, 300);
-	qg[3] = Point(0, 200);
+	qg[0] = Point(200, 100);
+	qg[1] = Point(150, 200);
+	qg[2] = Point(200, 300);
+	qg[3] = Point(100, 200);
 
-	rg[0] = Point(120, 90);
+	/*rg[0] = Point(120, 90);
 	rg[1] = Point(200, 90);
 	rg[2] = Point(200, 210);
 	rg[3] = Point(120, 210);*/
 
-	Polygon PL1(pg, N);
-	Polygon PL2(qg, N);
-	Polygon PL3(rg, N);
+	Polygon PL1(pg, 4);
+	Polygon PL2(qg, 4);
 	Yin Y1, Y2;
-	Y1.spadjor.push_back(PL1);
-	Y1.spadjor.push_back(PL2);
-	Y2.spadjor.push_back(PL3);
+	Y1.append(PL1);
+	Y2.append(PL2);
 	//Y1.intersect(Y2);
 	//drawYin(img, Y1);
 
 	//list<list<Point>> out;
 	//Y1.cut(out);
-	//Yin Y4 = Y1.inverse();
-	Yin Y3 = Y1.meet(Y2);
+	//Yin Y4 = Y1;
+	Yin Y3 = Y1.join(Y2);
+	Yin Y4 = Y3.inverse();
 	//Y4.spadjor.pop_back();
 	//drawYin(img, Y4,0);
 	//drawYin(img, Y2, 0);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2,0);
-	drawYin(img, Y1, 0);
-	drawYin(img, Y2, 0);
+	Y4.spadjor.pop_front();
+	drawYin(img, Y4, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
@@ -100,14 +83,14 @@ void drawPolygon(cv::Mat img, Polygon PL)
 
 void drawYin(cv::Mat img, Yin& Y, int mode)
 {
-	if (mode == 1)
+	//if (mode == 1)
 		for (int i = 0; i < img.rows; i++) {
 			for (int j = 0; j < img.cols; j++) {
 				if (Y.interiorTest(Point(j, i)))
-					img.at<cv::Vec3b>(i, j) = cv::Vec3b(128, 128, 128);
+					img.at<cv::Vec3b>(i, j) = cv::Vec3b(64, 64, 64);
 			}
 		}
-	else {
+	//else {
 		for (auto i = Y.spadjor.begin(); i != Y.spadjor.end(); i++) {
 			Polygon::Vertex* j = i->head;
 			do {
@@ -120,7 +103,7 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 				j = j->next;
 			} while (j != i->head);
 		}
-	}
+	//}
 }
 
 void slideBar(int val, void*)
@@ -129,29 +112,29 @@ void slideBar(int val, void*)
 	Point pg[N], qg[N], rg[N];
 	for (int i = 0; i < N; i++) {
 		double arg = (i * 2.0) / N * 3.1415926;
-		pg[i].x = 200 + (100 + 35 * cos(arg * 7)) * cos(arg);
-		pg[i].y = 200 + (100 + 35 * cos(arg * 5)) * sin(arg);
+		pg[i].x = 400 + (100 + 35 * cos(arg * 7)) * cos(arg);
+		pg[i].y = 300 + (100 + 35 * cos(arg * 5)) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
 		double arg = -(i * 2.0) / N * 3.1415926;
-		qg[i].x = 200 + (50) * cos(arg);
-		qg[i].y = 200 + (50) * sin(arg);
+		qg[i].x = 400 + (50) * cos(arg);
+		qg[i].y = 300 + (50) * sin(arg);
 	}
 	for (int i = 0; i < N; i++) {
 		double arg = (i * 2.0) / N * 3.1415926;
-		rg[i].x = 200 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * cos(arg);
-		rg[i].y = 200 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * sin(arg);
+		rg[i].x = 460 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * cos(arg);
+		rg[i].y = 300 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * sin(arg);
 	}
 
 	Polygon PL1(pg, N);
 	Polygon PL2(qg, N);
 	Polygon PL3(rg, N);
 	Yin Y1, Y2;
-	Y1.spadjor.push_back(PL1);
-	Y1.spadjor.push_back(PL2);
-	Y2.spadjor.push_back(PL3);
-	Yin Y4 = Y1.inverse();
-	Yin Y3 = Y2.join(Y4);
+	Y1.append(PL1);
+	Y1.append(PL2);
+	Y2.append(PL3);
+	Yin Y4 = Y2.inverse();
+	Yin Y3 = Y1.join(Y4);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2, 0);
 	drawYin(img, Y3, 0);
