@@ -11,6 +11,8 @@ void drawYin(cv::Mat img, Yin& Y, int mode);
 
 void slideBar(int val, void*);
 
+Yin Y1,Y2;
+Polygon::Vertex* te;
 
 int value1 = 1;
 
@@ -18,42 +20,71 @@ int main()
 {
 	srand(unsigned(time(0)));
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Point pg[4], qg[4];
-	pg[0] = Point(200,100);
-	pg[1] = Point(300, 200);
-	pg[2] = Point(200, 300);
-	pg[3] = Point(250, 200);
-
-	qg[0] = Point(200, 100);
-	qg[1] = Point(150, 200);
-	qg[2] = Point(200, 300);
-	qg[3] = Point(100, 200);
 
 	/*rg[0] = Point(120, 90);
 	rg[1] = Point(200, 90);
 	rg[2] = Point(200, 210);
 	rg[3] = Point(120, 210);*/
 
-	Polygon PL1(pg, 4);
-	Polygon PL2(qg, 4);
-	Yin Y1, Y2;
+
+
+	Polygon PL1("mickeydata/Data001.txt");
+	Polygon PL2("mickeydata/Data002.txt");
+	Polygon PL3("mickeydata/Data003.txt");
+	Polygon PL4("mickeydata/Data004.txt");
+	Polygon PL5("mickeydata/Data005.txt");
+	Polygon PL6("mickeydata/Data006.txt");
+
+	Polygon QL1("pandadata/Data001.txt");
+	Polygon QL2("pandadata/Data002.txt");
+	Polygon QL3("pandadata/Data003.txt");
+	Polygon QL4("pandadata/Data004.txt");
+	Polygon QL5("pandadata/Data005.txt");
+	Polygon QL6("pandadata/Data006.txt");
+	Polygon QL7("pandadata/Data007.txt");
+	Polygon QL8("pandadata/Data008.txt");
+	Polygon QL9("pandadata/Data009.txt");
+	Polygon QL10("pandadata/Data010.txt");
+	
 	Y1.append(PL1);
-	Y2.append(PL2);
-	//Y1.intersect(Y2);
+	Y1.append(PL2);
+	Y1.append(PL3);
+	Y1.append(PL4);
+	Y1.append(PL5);
+	Y1.append(PL6);
+
+	Y2.append(QL1);
+	Y2.append(QL2);
+	Y2.append(QL3);
+	Y2.append(QL4);
+	Y2.append(QL5);
+	Y2.append(QL6);
+	Y2.append(QL7);
+	Y2.append(QL8);
+	Y2.append(QL9);
+	Y2.append(QL10);
+
+	te = (Y2.spadjor.begin())->head;
 	//drawYin(img, Y1);
 
 	//list<list<Point>> out;
 	//Y1.cut(out);
 	//Yin Y4 = Y1;
 	Yin Y3 = Y1.join(Y2);
-	Yin Y4 = Y3.inverse();
+	drawYin(img, Y1, 1);
+	drawYin(img, Y2, 1);
+	drawYin(img, Y3, 0);
+	//drawPoint(img,Point(380.83679955096261, 152.66266035223680));
+	//drawPoint(img, Point(308.51901102099629 , 154.40530934868514));
+	//drawPoint(img, Point(385.24060265364523 , 145.56119825716991));
+	
 	//Y4.spadjor.pop_back();
 	//drawYin(img, Y4,0);
 	//drawYin(img, Y2, 0);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2,0);
-	Y4.spadjor.pop_front();
-	drawYin(img, Y4, 0);
+	
+	//drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
@@ -83,14 +114,14 @@ void drawPolygon(cv::Mat img, Polygon PL)
 
 void drawYin(cv::Mat img, Yin& Y, int mode)
 {
-	//if (mode == 1)
+	if (mode == 1)
 		for (int i = 0; i < img.rows; i++) {
 			for (int j = 0; j < img.cols; j++) {
 				if (Y.interiorTest(Point(j, i)))
-					img.at<cv::Vec3b>(i, j) = cv::Vec3b(64, 64, 64);
+					img.at<cv::Vec3b>(i, j) += cv::Vec3b(64, 64, 64);
 			}
 		}
-	//else {
+	else {
 		for (auto i = Y.spadjor.begin(); i != Y.spadjor.end(); i++) {
 			Polygon::Vertex* j = i->head;
 			do {
@@ -103,43 +134,15 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 				j = j->next;
 			} while (j != i->head);
 		}
-	//}
+	}
 }
 
 void slideBar(int val, void*)
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Point pg[N], qg[N], rg[N];
-	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0) / N * 3.1415926;
-		pg[i].x = 400 + (100 + 35 * cos(arg * 7)) * cos(arg);
-		pg[i].y = 300 + (100 + 35 * cos(arg * 5)) * sin(arg);
-	}
-	for (int i = 0; i < N; i++) {
-		double arg = -(i * 2.0) / N * 3.1415926;
-		qg[i].x = 400 + (50) * cos(arg);
-		qg[i].y = 300 + (50) * sin(arg);
-	}
-	for (int i = 0; i < N; i++) {
-		double arg = (i * 2.0) / N * 3.1415926;
-		rg[i].x = 460 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * cos(arg);
-		rg[i].y = 300 + (val - 50) * 2 + (100 + 90 * cos(arg * 4)) * sin(arg);
-	}
+	te = te->next;
 
-	Polygon PL1(pg, N);
-	Polygon PL2(qg, N);
-	Polygon PL3(rg, N);
-	Yin Y1, Y2;
-	Y1.append(PL1);
-	Y1.append(PL2);
-	Y2.append(PL3);
-	Yin Y4 = Y2.inverse();
-	Yin Y3 = Y1.join(Y4);
-	//drawYin(img, Y1, 0);
-	//drawYin(img, Y2, 0);
-	drawYin(img, Y3, 0);
-	int b0, b1;
-	Y3.getBettiNum(b0,b1);
-	cout << b0 << " " << b1 << endl;
+	drawYin(img, Y2, 0);
+	drawPoint(img,te->p);
 	cv::imshow("test", img);
 }

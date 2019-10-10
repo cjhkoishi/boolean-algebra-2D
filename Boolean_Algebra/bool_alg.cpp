@@ -139,7 +139,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	Point w = L2.Q - L2.P;
 	double cm = v.cross(w);
 	double err = 1e-6;
-	if (abs(cm) > 1e-6)
+	if (abs(cm) > 1e-12)
 	{
 		double t = (L2.P - L1.P).cross(w) / cm;
 		double s = (L2.P - L1.P).cross(v) / cm;
@@ -277,6 +277,19 @@ void Polygon::refreshOri()
 	}
 }
 
+void Polygon::reverse()
+{
+	Vertex* i = head;
+	if (head == 0)
+		return;
+	do {
+		Vertex* t = i->next;
+		i->next = i->last;
+		i->last = t;
+		i = i->next;
+	} while (i!=head);
+}
+
 Polygon::Polygon()
 {
 }
@@ -296,6 +309,23 @@ Polygon::Polygon(Point* pg, int n)
 		}
 		j->next = head;
 		head->last = j;
+	}
+}
+
+Polygon::Polygon(string filename)
+{
+	fstream f(filename, ios::in);
+	double input;
+	vector<double> buffer;
+	while (!f.eof()) {
+		f >> input;
+		buffer.push_back(input);
+	}
+	f.close();
+	int n = buffer.size() / 2;
+	for (int i = 0; i < n-1; i++) {
+		Point p(buffer[i]*100+50, buffer[n + i]*100+50);
+		append(p);
 	}
 }
 
@@ -351,7 +381,7 @@ Yin Yin::inverse()
 	}
 	Yin res(out);
 	res.sign = sign ^ true;
-	clearLabel();
+	//clearLabel();
 	return res;
 }
 
@@ -381,8 +411,8 @@ Yin Yin::meet(Yin& rhs)
 	}
 	Yin res(fin);
 	res.sign = sign && rhs.sign;
-	clearLabel();
-	rhs.clearLabel();
+	//clearLabel();
+	//rhs.clearLabel();
 	return res;
 }
 
@@ -451,6 +481,8 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 		Q.erase(--Q.end());
 		//working
 
+		if (Q.size() == 1630)
+			int dsdd = 1;
 
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
@@ -539,6 +571,8 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 
 bool Yin::interiorTest(Point c)
 {
+	if (spadjor.empty())
+		return sign;
 	bool res = false;
 	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		bool b = i->interiorTest(c);
@@ -588,6 +622,10 @@ void Yin::cut(list<list<Point>>& out)
 				out.push_front(list<Point>());
 				linker = out.begin();
 				linker->push_back(it->p);
+				//?
+				if (it->p == Point(380.83679955096261, 152.66266035223680))
+					int sss = 1;
+				//?
 			}
 			it = it->next;
 		} while (it != start);
@@ -609,6 +647,10 @@ void Yin::getBettiNum(int& b0, int& b1)
 
 void Yin::append(Polygon PL)
 {
+	PL.refreshOri();
+	bool ori = PL.orientation;
+	if (!interiorTest(PL.head->p) ^ ori)
+		PL.reverse();
 	PL.refreshOri();
 	spadjor.push_back(PL);
 }

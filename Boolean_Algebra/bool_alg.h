@@ -1,5 +1,6 @@
 #pragma once
 #include<iostream>
+#include<fstream>
 #include<list>
 #include<vector>
 #include<set>
@@ -54,7 +55,7 @@ public:
 	{
 		Point p;
 		Vertex* next=0, * last=0;
-		bool isMarked;//是否是分割点
+		bool isMarked=false;//是否是分割点
 	};
 	Vertex* head = 0;//指向双向链表起始节点
 	bool orientation = false;//多边形的绕向，被动变量
@@ -63,8 +64,11 @@ public:
 	void append(Point c);//在head顶点之前插入一个顶点
 	void refreshOri();//计算定向并刷新变量
 
+	void reverse();
+
 	Polygon();
 	Polygon(Point* pg, int n);
+	Polygon(string filename);
 	Polygon(const Polygon& obj);
 	~Polygon();
 };
