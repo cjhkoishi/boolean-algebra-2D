@@ -15,16 +15,35 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
-int main()
-{
-	srand(unsigned(time(0)));
+int main() {
+
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
-	/*rg[0] = Point(120, 90);
-	rg[1] = Point(200, 90);
-	rg[2] = Point(200, 210);
-	rg[3] = Point(120, 210);*/
+	Polygon PL1, PL2;
+	PL1.append(Point(1, 0));
+	PL1.append(Point(101, 0));
+	PL1.append(Point(101, 100));
+	PL1.append(Point(1, 100));
 
+	PL2.append(Point(100, 0));
+	PL2.append(Point(200, 0));
+	PL2.append(Point(200, 100));
+	PL2.append(Point(100, 100));
+	Y1.append(PL1);
+	Y2.append(PL2);
+
+	Yin Y3 = Y1.meet(Y2);
+	drawYin(img, Y3, 0);
+
+	cv::imshow("test", img);
+	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
+	cv::waitKey(0);
+	return 0;
+}
+
+int main1()
+{
+	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	stringstream ss;
 	string s1[6], s2[10];
 	for (int i = 0; i < 6; i++) {
@@ -32,34 +51,17 @@ int main()
 		ss << "mickeydata/Data_" << i + 1 << ".txt";
 		s1[i] = ss.str();
 	}
-
 	for (int i = 0; i < 10; i++) {
 		ss.str("");
 		ss << "pandadata/Data_" << i + 1 << ".txt";
 		s2[i] = ss.str();
 	}
-
 	Y1.load(s1, 6);
 	Y2.load(s2, 10);
-	//drawYin(img, Y1);
-
-	//list<list<Point>> out;
-	//Y1.cut(out);
-	//Yin Y4 = Y1;
 	Y1.move(Point(180, 0));
-	Yin Y3=Y1.meet(Y2);
-	//Y1.intersect(Y2);
+	Yin Y3 = Y1.meet(Y2);
 	drawYin(img, Y1, 1);
 	drawYin(img, Y2, 1);
-	//drawPoint(img,Point(534.88986354429699 ,373.22797462977070));
-	//drawPoint(img, Point(308.51901102099629 , 154.40530934868514));
-	//drawPoint(img, Point(385.24060265364523 , 145.56119825716991));
-
-	//Y4.spadjor.pop_back();
-	//drawYin(img, Y4,0);
-	//drawYin(img, Y2, 0);
-	//drawYin(img, Y1, 0);
-	//drawYin(img, Y2,0);
 
 	drawYin(img, Y3, 0);
 
@@ -117,7 +119,7 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 void slideBar(int val, void*)
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Y1.move(Point(1,0));
+	Y1.move(Point(1, 0));
 	Yin Y3 = Y1.meet(Y2);
 	drawYin(img, Y3, 0);
 	cv::imshow("test", img);

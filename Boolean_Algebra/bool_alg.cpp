@@ -295,6 +295,41 @@ void Polygon::reverse()
 	} while (i != head);
 }
 
+bool Polygon::split(list<Polygon>& result)
+{
+	int num = 0;
+	map<Point, list<Point>::iterator> pool;
+	list<Point> chain;
+	chain.push_back(head->p);
+	pool[head->p] = --chain.end();
+	auto i = head;
+	do {
+		bool t = pool.find(i->next->p) != pool.end();
+		if (t)
+		{
+			result.push_front(Polygon());
+			auto newPl = result.begin();
+			auto splitpos = pool[i->next->p];
+			for (auto j = splitpos; j != chain.end(); j++) {
+				if (j != splitpos)
+					pool.erase(*j);
+				newPl->append(*j);
+
+			}
+			newPl->refreshOri();
+			num++;
+			chain.erase(++splitpos, chain.end());
+		}
+		else
+		{
+			chain.push_back(i->next->p);
+			pool[i->next->p] = --chain.end();
+		}
+		i = i->next;
+	} while (i != head);
+	return num > 1;
+}
+
 Polygon::Polygon()
 {
 }
@@ -736,15 +771,14 @@ Yin::Yin(list<list<Point>>& segments)
 			return;
 
 		list<Point>* beta = *t->second.O.begin();
-		spadjor.push_front(Polygon());
-		auto Jor = spadjor.begin();
+		Polygon Jor;
 		Point start;
 		auto current = beta->begin();
 		start = *current;
 		bool flag = true;
 
 		do {
-			Jor->append(*current);
+			Jor.append(*current);
 			current++;
 			if (current == beta->end()) {
 				si[*beta->begin()].O.remove(beta);
@@ -753,7 +787,6 @@ Yin::Yin(list<list<Point>>& segments)
 				if (sobo.empty())
 				{
 					flag = false;
-					spadjor.pop_front();
 					break;
 				}
 				//working
@@ -783,7 +816,9 @@ Yin::Yin(list<list<Point>>& segments)
 		}
 		si[*beta->begin()].O.remove(beta);
 		si[*beta->rbegin()].I.remove(beta);
-		Jor->refreshOri();
+		list<Polygon> atom;
+		Jor.split(atom);
+		spadjor.insert(spadjor.end(), atom.begin(),atom.end());
 	}
 
 }

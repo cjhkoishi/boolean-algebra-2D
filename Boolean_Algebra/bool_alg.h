@@ -66,6 +66,7 @@ public:
 	void refreshOri();//计算定向并刷新变量
 
 	void reverse();
+	bool split(list<Polygon>& result);
 
 	Polygon();
 	Polygon(Point* pg, int n);
