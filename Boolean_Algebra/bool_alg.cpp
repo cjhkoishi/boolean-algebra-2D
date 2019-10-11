@@ -142,10 +142,11 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	{
 		double t = (L2.P - L1.P).cross(w) / cm;
 		Point intersection = L1.P + t * v;
-		bool isInsideLine = (intersection < L1.P ^ intersection < L1.Q) && (intersection < L2.P ^ intersection < L2.Q);
-		bool isEndPoint1 = intersection == L1.P || intersection == L1.Q;
-		bool isEndPoint2 = intersection == L2.P || intersection == L2.Q;
-		if (isInsideLine || isEndPoint1 || isEndPoint2)
+		bool isInsideLine1 = (intersection < L1.P ^ intersection < L1.Q);
+		bool isInsideLine2 = (intersection < L2.P ^ intersection < L2.Q);
+		bool isEndPoint1 = (intersection == L1.P || intersection == L1.Q);
+		bool isEndPoint2 = (intersection == L2.P || intersection == L2.Q);
+		if ((isInsideLine1|| isEndPoint1) && (isInsideLine2 || isEndPoint2))
 		{
 			if (intersection < p || intersection == p)
 			{
@@ -189,7 +190,7 @@ bool Line::operator<(const Line rhs) const
 		if (k1 != k2)
 			return (E.x > M + 2e-5) ^ (k1 < k2);
 		else if (P == rhs.P && Q == rhs.Q)
-			return ID < rhs. ID;
+			return ID < rhs.ID;
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}
@@ -328,7 +329,8 @@ Polygon::Polygon(string filename)
 	f.close();
 	int n = buffer.size() / 2;
 	for (int i = 0; i < n - 1; i++) {
-		Point p((buffer[i] * 100 - 84.88986354429699-400)*20+400, (buffer[n + i] * 100 - 23.22797462977070-300)*20+300);
+		//Point p((buffer[i] * 100 - 84.88986354429699-400)*20+400, (buffer[n + i] * 100 - 23.22797462977070-300)*20+300);
+		Point p(buffer[i] * 100 + 50, buffer[n + i] * 100 + 50);
 		append(p);
 	}
 }
@@ -441,23 +443,28 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 
 	//¹¹ÔìÏß¶ÎÁ´±í
 	list<Line> lines;
+	int id = 1;
 	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* ii = i->head;
 		do {
 			Line l(ii->p, ii->next->p);
+			l.ID = id;
 			lines.push_back(l);
 			intersectTable[l] = ii;
 			ii = ii->next;
 		} while (ii != i->head);
+		id++;
 	}
 	for (auto i = obj.spadjor.begin(); i != obj.spadjor.end(); i++) {
 		Polygon::Vertex* ii = i->head;
 		do {
 			Line l(ii->p, ii->next->p);
+			l.ID = id;
 			lines.push_back(l);
 			intersectTable[l] = ii;
 			ii = ii->next;
 		} while (ii != i->head);
+		id++;
 	}
 
 	//¼ÆËã½»µã
@@ -485,13 +492,12 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 		Q.erase(--Q.end());
 		//working
 
-		if (Q.size() == 1630)
-			int dsdd = 1;
 
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
 			intersections[p] = pi;
 		}
+
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)

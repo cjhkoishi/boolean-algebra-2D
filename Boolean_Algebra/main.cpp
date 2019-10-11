@@ -47,10 +47,10 @@ int main()
 	//Y1.cut(out);
 	//Yin Y4 = Y1;
 	Y1.move(Point(180, 0));
-	//Yin Y3=Y1.meet(Y2);
-	Y1.intersect(Y2);
-	drawYin(img, Y1, 0);
-	drawYin(img, Y2, 0);
+	Yin Y3=Y1.join(Y2);
+	//Y1.intersect(Y2);
+	drawYin(img, Y1, 1);
+	drawYin(img, Y2, 1);
 	//drawPoint(img,Point(534.88986354429699 ,373.22797462977070));
 	//drawPoint(img, Point(308.51901102099629 , 154.40530934868514));
 	//drawPoint(img, Point(385.24060265364523 , 145.56119825716991));
@@ -61,7 +61,7 @@ int main()
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2,0);
 
-	//drawYin(img, Y3, 0);
+	drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
