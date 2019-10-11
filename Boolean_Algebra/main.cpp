@@ -11,8 +11,7 @@ void drawYin(cv::Mat img, Yin& Y, int mode);
 
 void slideBar(int val, void*);
 
-Yin Y1,Y2;
-Polygon::Vertex* te;
+Yin Y1, Y2;
 
 int value1 = 1;
 
@@ -26,64 +25,42 @@ int main()
 	rg[2] = Point(200, 210);
 	rg[3] = Point(120, 210);*/
 
+	stringstream ss;
+	string s1[6], s2[10];
+	for (int i = 0; i < 6; i++) {
+		ss.str("");
+		ss << "mickeydata/Data_" << i + 1 << ".txt";
+		s1[i] = ss.str();
+	}
 
+	for (int i = 0; i < 10; i++) {
+		ss.str("");
+		ss << "pandadata/Data_" << i + 1 << ".txt";
+		s2[i] = ss.str();
+	}
 
-	Polygon PL1("mickeydata/Data001.txt");
-	Polygon PL2("mickeydata/Data002.txt");
-	Polygon PL3("mickeydata/Data003.txt");
-	Polygon PL4("mickeydata/Data004.txt");
-	Polygon PL5("mickeydata/Data005.txt");
-	Polygon PL6("mickeydata/Data006.txt");
-
-	Polygon QL1("pandadata/Data001.txt");
-	Polygon QL2("pandadata/Data002.txt");
-	Polygon QL3("pandadata/Data003.txt");
-	Polygon QL4("pandadata/Data004.txt");
-	Polygon QL5("pandadata/Data005.txt");
-	Polygon QL6("pandadata/Data006.txt");
-	Polygon QL7("pandadata/Data007.txt");
-	Polygon QL8("pandadata/Data008.txt");
-	Polygon QL9("pandadata/Data009.txt");
-	Polygon QL10("pandadata/Data010.txt");
-	
-	Y1.append(PL1);
-	Y1.append(PL2);
-	Y1.append(PL3);
-	Y1.append(PL4);
-	Y1.append(PL5);
-	Y1.append(PL6);
-
-	Y2.append(QL1);
-	Y2.append(QL2);
-	Y2.append(QL3);
-	Y2.append(QL4);
-	Y2.append(QL5);
-	Y2.append(QL6);
-	Y2.append(QL7);
-	Y2.append(QL8);
-	Y2.append(QL9);
-	Y2.append(QL10);
-
-	te = (Y2.spadjor.begin())->head;
+	Y1.load(s1, 6);
+	Y2.load(s2, 10);
 	//drawYin(img, Y1);
 
 	//list<list<Point>> out;
 	//Y1.cut(out);
 	//Yin Y4 = Y1;
-	Yin Y3 = Y1.join(Y2);
-	drawYin(img, Y1, 1);
-	drawYin(img, Y2, 1);
-	drawYin(img, Y3, 0);
-	//drawPoint(img,Point(380.83679955096261, 152.66266035223680));
+	Y1.move(Point(180, 0));
+	//Yin Y3=Y1.meet(Y2);
+	Y1.intersect(Y2);
+	drawYin(img, Y1, 0);
+	drawYin(img, Y2, 0);
+	//drawPoint(img,Point(534.88986354429699 ,373.22797462977070));
 	//drawPoint(img, Point(308.51901102099629 , 154.40530934868514));
 	//drawPoint(img, Point(385.24060265364523 , 145.56119825716991));
-	
+
 	//Y4.spadjor.pop_back();
 	//drawYin(img, Y4,0);
 	//drawYin(img, Y2, 0);
 	//drawYin(img, Y1, 0);
 	//drawYin(img, Y2,0);
-	
+
 	//drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
@@ -140,9 +117,8 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 void slideBar(int val, void*)
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	te = te->next;
-
-	drawYin(img, Y2, 0);
-	drawPoint(img,te->p);
+	Y1.move(Point(1,0));
+	Yin Y3 = Y1.meet(Y2);
+	drawYin(img, Y3, 0);
 	cv::imshow("test", img);
 }

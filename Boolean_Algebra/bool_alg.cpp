@@ -138,22 +138,24 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	Point v = L1.Q - L1.P;
 	Point w = L2.Q - L2.P;
 	double cm = v.cross(w);
-	double err = 1e-6;
 	if (abs(cm) > 1e-12)
 	{
 		double t = (L2.P - L1.P).cross(w) / cm;
-		double s = (L2.P - L1.P).cross(v) / cm;
-		if (t > -err && t < 1 + err && s > -err && s < 1 + err)
+		Point intersection = L1.P + t * v;
+		bool isInsideLine = (intersection < L1.P ^ intersection < L1.Q) && (intersection < L2.P ^ intersection < L2.Q);
+		bool isEndPoint1 = intersection == L1.P || intersection == L1.Q;
+		bool isEndPoint2 = intersection == L2.P || intersection == L2.Q;
+		if (isInsideLine || isEndPoint1 || isEndPoint2)
 		{
-			Point insection = L1.P + t * v;
-			if (insection < p || insection == p)
+			if (intersection < p || intersection == p)
 			{
-				PointInfo& pi = Q[insection];
-				if ((find(pi.L.begin(), pi.L.end(), L1) == pi.L.end()) && (find(pi.U.begin(), pi.U.end(), L1) == pi.U.end()))
+				PointInfo& pi = Q[intersection];
+				bool CF1 = find(pi.C.begin(), pi.C.end(), L1) == pi.C.end();
+				bool CF2 = find(pi.C.begin(), pi.C.end(), L2) == pi.C.end();
+				if (CF1 && !isEndPoint1)
 					pi.C.push_back(L1);
-				if ((find(pi.L.begin(), pi.L.end(), L2) == pi.L.end()) && (find(pi.U.begin(), pi.U.end(), L2) == pi.U.end()))
+				if (CF2 && !isEndPoint2)
 					pi.C.push_back(L2);
-				pi.C.unique();
 			}
 		}
 	}
@@ -186,6 +188,8 @@ bool Line::operator<(const Line rhs) const
 		double k2 = (rhs.Q.x - rhs.P.x) / (rhs.P.y - rhs.Q.y);
 		if (k1 != k2)
 			return (E.x > M + 2e-5) ^ (k1 < k2);
+		else if (P == rhs.P && Q == rhs.Q)
+			return ID < rhs. ID;
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}
@@ -193,7 +197,7 @@ bool Line::operator<(const Line rhs) const
 
 bool Line::operator==(const Line rhs) const
 {
-	return P == rhs.P && Q == rhs.Q || P == rhs.Q && Q == rhs.P;
+	return P == rhs.P && Q == rhs.Q;
 }
 
 Line::Line()
@@ -287,7 +291,7 @@ void Polygon::reverse()
 		i->next = i->last;
 		i->last = t;
 		i = i->next;
-	} while (i!=head);
+	} while (i != head);
 }
 
 Polygon::Polygon()
@@ -323,8 +327,8 @@ Polygon::Polygon(string filename)
 	}
 	f.close();
 	int n = buffer.size() / 2;
-	for (int i = 0; i < n-1; i++) {
-		Point p(buffer[i]*100+50, buffer[n + i]*100+50);
+	for (int i = 0; i < n - 1; i++) {
+		Point p((buffer[i] * 100 - 84.88986354429699-400)*20+400, (buffer[n + i] * 100 - 23.22797462977070-300)*20+300);
 		append(p);
 	}
 }
@@ -366,10 +370,10 @@ Polygon::~Polygon()
 
 Yin Yin::inverse()
 {
-	Yin null;
-	intersect(null);
+	Yin null, lhs = *this;
+	lhs.intersect(null);
 	list<list<Point>> out;
-	cut(out);
+	lhs.cut(out);
 	for (auto i = out.begin(); i != out.end(); i++) {
 		list<Point> buf = *i;
 		i->clear();
@@ -380,16 +384,17 @@ Yin Yin::inverse()
 		}
 	}
 	Yin res(out);
-	res.sign = sign ^ true;
+	res.sign = lhs.sign ^ true;
 	//clearLabel();
 	return res;
 }
 
-Yin Yin::meet(Yin& rhs)
+Yin Yin::meet(Yin rhs)
 {
+	Yin lhs = *this;
 	list<list<Point>> out1, out2, fin;
-	intersect(rhs);
-	cut(out1);
+	lhs.intersect(rhs);
+	lhs.cut(out1);
 	rhs.cut(out2);
 	for (auto i = out1.begin(); i != out1.end(); i++) {
 		Point c = *i->begin();
@@ -404,19 +409,20 @@ Yin Yin::meet(Yin& rhs)
 		Point c = *i->begin();
 		Point d = *(++i->begin());
 		Point testp = 0.5 * (c + d);
-		bool isInterior = interiorTest(testp);
-		bool isCoincide = onTest(c, d);
+		bool isInterior = lhs.interiorTest(testp);
+		bool isCoincide = lhs.onTest(c, d);
 		if (isInterior && !isCoincide)
 			fin.push_back(*i);
 	}
+
 	Yin res(fin);
-	res.sign = sign && rhs.sign;
+	res.sign = lhs.sign && rhs.sign;
 	//clearLabel();
 	//rhs.clearLabel();
 	return res;
 }
 
-Yin Yin::join(Yin& rhs)
+Yin Yin::join(Yin rhs)
 {
 	Yin rl = inverse();
 	Yin rr = rhs.inverse();
@@ -470,9 +476,7 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 			lower = &i->P;
 		}
 		Q[*upper].U.push_back(*i);
-		Q[*upper].U.unique();
 		Q[*lower].L.push_back(*i);
-		Q[*upper].L.unique();
 	}
 	while (!Q.empty())
 	{
@@ -666,6 +670,25 @@ void Yin::clearLabel()
 	}
 }
 
+void Yin::load(string datafiles[], int num)
+{
+	for (int i = 0; i < num; i++) {
+		Polygon PL(datafiles[i]);
+		append(PL);
+	}
+}
+
+void Yin::move(Point p)
+{
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		auto j = i->head;
+		do {
+			j->p = j->p + p;
+			j = j->next;
+		} while (j != i->head);
+	}
+}
+
 Yin::Yin()
 {
 }
@@ -743,6 +766,11 @@ Yin::Yin(list<list<Point>>& segments)
 		Jor->refreshOri();
 	}
 
+}
+
+Yin::Yin(string datafiles[], int num)
+{
+	load(datafiles, num);
 }
 
 Yin::~Yin()

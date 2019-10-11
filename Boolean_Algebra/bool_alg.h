@@ -34,6 +34,7 @@ class Line //线段类
 {
 public:
 	Point P, Q;//线段端点
+	int ID = 0;
 
 	static Point E;//扫描线事件点，与操作符<的结果相关联
 
@@ -54,8 +55,8 @@ public:
 	struct Vertex //包含定点坐标，邻接指针，相交标签等属性
 	{
 		Point p;
-		Vertex* next=0, * last=0;
-		bool isMarked=false;//是否是分割点
+		Vertex* next = 0, * last = 0;
+		bool isMarked = false;//是否是分割点
 	};
 	Vertex* head = 0;//指向双向链表起始节点
 	bool orientation = false;//多边形的绕向，被动变量
@@ -80,18 +81,22 @@ public:
 	bool sign = false;
 	//布尔运算
 	Yin inverse();
-	Yin meet(Yin& rhs);      
-	Yin join(Yin& rhs);
+	Yin meet(Yin rhs);
+	Yin join(Yin rhs);
 
 	void intersect(Yin& obj);//求多边形集合的交点，并插入新交点数据
 	bool interiorTest(Point c);//Yin set的内部检测
-	bool onTest(Point c,Point d);//有向线段cd是否与多边形重合且同向
+	bool onTest(Point c, Point d);//有向线段cd是否与多边形重合且同向
 	void cut(list<list<Point>>& out);//利用标记点分割成折线段
-	void getBettiNum(int& b0,int& b1);//计算betti数
+	void getBettiNum(int& b0, int& b1);//计算betti数
 	void append(Polygon PL);//添加多边形
 	void clearLabel();//清空标记点的标记
 
+	void load(string datafiles[], int num);
+	void move(Point p);
+
 	Yin();
 	Yin(list<list<Point>>& segment);//利用线段集合生成spadjor
+	Yin(string datafiles[], int num);
 	~Yin();
 };
