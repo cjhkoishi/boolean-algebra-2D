@@ -146,7 +146,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 		bool isInsideLine2 = (intersection < L2.P ^ intersection < L2.Q);
 		bool isEndPoint1 = (intersection == L1.P || intersection == L1.Q);
 		bool isEndPoint2 = (intersection == L2.P || intersection == L2.Q);
-		if ((isInsideLine1|| isEndPoint1) && (isInsideLine2 || isEndPoint2))
+		if ((isInsideLine1 || isEndPoint1) && (isInsideLine2 || isEndPoint2))
 		{
 			if (intersection < p || intersection == p)
 			{
@@ -413,7 +413,8 @@ Yin Yin::meet(Yin rhs)
 		Point testp = 0.5 * (c + d);
 		bool isInterior = lhs.interiorTest(testp);
 		bool isCoincide = lhs.onTest(c, d);
-		if (isInterior && !isCoincide)
+		bool isInv = lhs.onTestInv(c, d);
+		if (isInterior && !isCoincide && !isInv)
 			fin.push_back(*i);
 	}
 
@@ -597,6 +598,19 @@ bool Yin::onTest(Point c, Point d)
 		Polygon::Vertex* j = i->head;
 		do {
 			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) > 0)
+				return true;
+			j = j->next;
+		} while (j != i->head);
+	}
+	return false;
+}
+
+bool Yin::onTestInv(Point c, Point d)
+{
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		Polygon::Vertex* j = i->head;
+		do {
+			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) < 0)
 				return true;
 			j = j->next;
 		} while (j != i->head);

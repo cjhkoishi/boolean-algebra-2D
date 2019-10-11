@@ -47,7 +47,7 @@ int main()
 	//Y1.cut(out);
 	//Yin Y4 = Y1;
 	Y1.move(Point(180, 0));
-	Yin Y3=Y1.join(Y2);
+	Yin Y3=Y1.meet(Y2);
 	//Y1.intersect(Y2);
 	drawYin(img, Y1, 1);
 	drawYin(img, Y2, 1);

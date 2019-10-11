@@ -87,6 +87,7 @@ public:
 	void intersect(Yin& obj);//求多边形集合的交点，并插入新交点数据
 	bool interiorTest(Point c);//Yin set的内部检测
 	bool onTest(Point c, Point d);//有向线段cd是否与多边形重合且同向
+	bool onTestInv(Point c, Point d);//有向线段cd是否与多边形重合且逆向
 	void cut(list<list<Point>>& out);//利用标记点分割成折线段
 	void getBettiNum(int& b0, int& b1);//计算betti数
 	void append(Polygon PL);//添加多边形
