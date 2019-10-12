@@ -138,7 +138,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	Point v = L1.Q - L1.P;
 	Point w = L2.Q - L2.P;
 	double cm = v.cross(w);
-	if (abs(cm) > 1e-12)
+	if (abs(cm) != 0)
 	{
 		double t = (L2.P - L1.P).cross(w) / cm;
 		Point intersection = L1.P + t * v;
@@ -159,6 +159,24 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 					pi.C.push_back(L2);
 			}
 		}
+	}
+	else if ((L1.P - L2.P).cross(v) == 0) {
+		bool isIn[4];
+		Point endpoint[4] = { L1.P,L1.Q,L2.P,L2.Q };
+		isIn[0] = (L1.P < L2.P ^ L1.P < L2.Q) && !(L1.P == L2.P || L1.P == L2.Q);
+		isIn[1] = (L1.Q < L2.P ^ L1.Q < L2.Q) && !(L1.Q == L2.P || L1.Q == L2.Q);
+		isIn[2] = (L2.P < L1.P ^ L2.P < L1.Q) && !(L2.P == L1.P || L2.P == L1.Q);
+		isIn[3] = (L2.Q < L1.P ^ L2.Q < L1.Q) && !(L2.Q == L1.P || L2.Q == L1.Q);
+		for (int i = 0; i < 4; i++)
+			if (isIn[i] && (endpoint[i] < p || endpoint[i] == p))
+			{
+				int tak = i / 2;
+				Line tkl = tak == 0 ? L2 : L1;
+				PointInfo& pi = Q[endpoint[i]];
+				bool CF = find(pi.C.begin(), pi.C.end(), tkl) == pi.C.end();
+				if (CF)
+					pi.C.push_back(tkl);
+			}
 	}
 }
 
@@ -202,16 +220,18 @@ bool Line::operator<(const Line rhs) const
 		double k2 = (rhs.Q.x - rhs.P.x) / (rhs.P.y - rhs.Q.y);
 		if (k1 != k2)
 			return (E.x > M + 2e-5) ^ (k1 < k2);
-		else if (P == rhs.P && Q == rhs.Q)
-			return ID < rhs.ID;
 		else
-			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}*/
 }
 
 bool Line::operator==(const Line rhs) const
 {
 	return P == rhs.P && Q == rhs.Q;
+}
+
+bool Line::isSameLine(const Line rhs)const
+{
+	return (P - Q).cross(rhs.P - rhs.Q) < 1e-12 && (P - rhs.P).cross(P - Q) < 1e-12;
 }
 
 Line::Line()
@@ -541,9 +561,6 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 
 		//working
 
-
-
-
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
@@ -563,8 +580,17 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 			sr++;
 			T.erase(*pi.L.begin());
 
-			if (sl != T.end() && sr != T.end())
-				findNextEvent(*sl, *sr, p, Q);
+			pair<set<Line>::iterator, set<Line>::iterator> left, right;
+			left.first = left.second = sl;
+			right.first = right.second = sr;
+			while (left.second != T.end() && left.second->isSameLine(*left.first))
+				left.second--;
+			while (right.second != T.end() && right.second->isSameLine(*right.first))
+				right.second++;
+
+			for (auto it = left.first; it != left.second; it--)
+				for (auto jt = right.first; jt != right.second; jt++)
+					findNextEvent(*it, *jt, p, Q);
 		}
 		else {
 			set<Line> UC;
@@ -572,39 +598,20 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 			UC.insert(pi.C.begin(), pi.C.end());
 			auto i_smin = T.find(*UC.begin());
 			auto i_smax = T.find(*UC.rbegin());
-
-
-			auto sl = i_smin;
-			--sl;
-			auto sr = i_smax;
-			++sr;
-
-			auto j_smin = i_smin;
-			auto j_smax = i_smax;
-			auto e_sl = sl;
-			auto e_sr = sr;
-			while (j_smin != sr && (j_smin->Q - j_smin->P).cross(i_smin->Q - i_smin->P) < 1e-12)
-				j_smin++;
-			while (j_smax != sl && (j_smax->Q - j_smax->P).cross(i_smax->Q - i_smax->P) < 1e-12)
-				j_smax--;
-			while (e_sl != T.end() && (e_sl->Q - e_sl->P).cross(sl->Q - sl->P) < 1e-12)
-				e_sl--;
-			while (e_sr != T.end() && (e_sr->Q - e_sr->P).cross(sr->Q - sr->P) < 1e-12)
-				e_sr++;
-
+			Line smin = *i_smin;
+			Line smax = *i_smax;
+			auto sl = --i_smin;
+			auto sr = ++i_smax;
 			if (sl != T.end())
-				for (auto it = i_smin; it != j_smin; it++)
-					for (auto jt = sl; jt != e_sl; jt--)
-						findNextEvent(*jt, *it, p, Q);
+				findNextEvent(*sl, smin, p, Q);
 			if (sr != T.end())
-				for (auto it = i_smax; it != j_smax; it--)
-					for (auto jt = sr; jt != e_sr; jt++)
-						findNextEvent(*it, *jt, p, Q);
+				findNextEvent(smax, *sr, p, Q);
 		}
 		//working
+		pi = Q[p];
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
-			intersections[p] = Q[p];
+			intersections[p] = pi;
 		}
 		Q.erase(--Q.end());
 	}
@@ -716,10 +723,6 @@ void Yin::cut(list<list<Point>>& out)
 				out.push_front(list<Point>());
 				linker = out.begin();
 				linker->push_back(it->p);
-				//?
-				if (it->p == Point(380.83679955096261, 152.66266035223680))
-					int sss = 1;
-				//?
 			}
 			it = it->next;
 		} while (it != start);

@@ -20,10 +20,10 @@ int main() {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
 	Polygon PL1, PL2;
-	PL1.append(Point(1, 0));
-	PL1.append(Point(101, 0));
-	PL1.append(Point(101, 100));
-	PL1.append(Point(1, 100));
+	PL1.append(Point(150, 0));
+	PL1.append(Point(250, 0));
+	PL1.append(Point(250, 100));
+	PL1.append(Point(150, 100));
 
 	PL2.append(Point(100, 0));
 	PL2.append(Point(200, 0));
@@ -60,8 +60,8 @@ int main1()
 	Y2.load(s2, 10);
 	Y1.move(Point(180, 0));
 	Yin Y3 = Y1.meet(Y2);
-	//drawYin(img, Y1, 1);
-	//drawYin(img, Y2, 1);
+	drawYin(img, Y1, 1);
+	drawYin(img, Y2, 1);
 
 	drawYin(img, Y3, 0);
 

@@ -41,6 +41,8 @@ public:
 	bool operator<(const Line rhs)const;//扫描线相关的序结构
 	bool operator==(const Line rhs)const;//无向意义下的相等比较
 
+	bool isSameLine(const Line rhs)const;
+
 	//friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
 
 	Line();
