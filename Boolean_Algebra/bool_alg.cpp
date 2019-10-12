@@ -37,7 +37,7 @@ bool Point::operator<(const Point rhs) const
 
 bool Point::operator==(const Point rhs) const
 {
-	return (abs(x - rhs.x) < 1e-8) && (abs(y - rhs.y) < 1e-8);
+	return (abs(x - rhs.x) < 1e-9) && (abs(y - rhs.y) < 1e-9);
 }
 
 Point::Point() :x(0), y(0)
@@ -232,6 +232,14 @@ bool Line::operator==(const Line rhs) const
 bool Line::isSameLine(const Line rhs)const
 {
 	return (P - Q).cross(rhs.P - rhs.Q) < 1e-12 && (P - rhs.P).cross(P - Q) < 1e-12;
+}
+
+bool Line::isInside(Point c)const
+{
+	Point b = c - Q;
+	Point d = P - Q;
+	Point proj = (b * d / (sqrt(b.x * b.x + b.y * b.y) * sqrt(d.x * d.x + d.y * d.y))) * b + Q;
+	return c == proj && (proj < P ^ proj < Q) && !(proj == P) && !(proj == Q);
 }
 
 Line::Line()
@@ -560,6 +568,10 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øÐÐ¶à±ßÐÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 		PointInfo pi = Q[p];
 
 		//working
+		for (auto i = T.begin(); i != T.end(); i++) {
+			if (i->isInside(p) && find(pi.C.begin(), pi.C.end(), *i) == pi.C.end())
+				Q[p].C.push_back(*i);
+		}
 
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);

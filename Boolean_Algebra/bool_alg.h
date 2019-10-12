@@ -42,6 +42,7 @@ public:
 	bool operator==(const Line rhs)const;//无向意义下的相等比较
 
 	bool isSameLine(const Line rhs)const;
+	bool isInside(Point c)const;
 
 	//friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
 

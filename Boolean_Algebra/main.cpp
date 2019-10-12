@@ -15,15 +15,15 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
-int main() {
+int main1() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
 	Polygon PL1, PL2;
-	PL1.append(Point(150, 0));
-	PL1.append(Point(250, 0));
-	PL1.append(Point(250, 100));
-	PL1.append(Point(150, 100));
+	PL1.append(Point(0, 50));
+	PL1.append(Point(100, 50));
+	PL1.append(Point(100, 100));
+	PL1.append(Point(0, 100));
 
 	PL2.append(Point(100, 0));
 	PL2.append(Point(200, 0));
@@ -41,7 +41,7 @@ int main() {
 	return 0;
 }
 
-int main1()
+int main()
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	stringstream ss;
@@ -58,8 +58,9 @@ int main1()
 	}
 	Y1.load(s1, 6);
 	Y2.load(s2, 10);
-	Y1.move(Point(180, 0));
-	Yin Y3 = Y1.meet(Y2);
+	Y1.move(Point(100, 0));
+	Yin Y3 = Y1.join(Y2);
+	//Y1.intersect(Y2);
 	drawYin(img, Y1, 1);
 	drawYin(img, Y2, 1);
 
@@ -120,7 +121,7 @@ void slideBar(int val, void*)
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	Y1.move(Point(1, 0));
-	Yin Y3 = Y1.meet(Y2);
+	Yin Y3 = Y1.join(Y2);
 	drawYin(img, Y3, 0);
 	cv::imshow("test", img);
 }
