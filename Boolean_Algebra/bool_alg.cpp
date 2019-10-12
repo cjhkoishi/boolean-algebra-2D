@@ -183,8 +183,8 @@ bool Line::operator<(const Line rhs) const
 	else {
 		Point v1 = Q - P;
 		Point v2 = rhs.Q - rhs.P;
-		v1 = v1 < Point(0, 0) ? v1: Point(0, 0) - v1;
-		v2 = v2 < Point(0, 0) ? v2: Point(0, 0) - v2;
+		v1 = v1 < Point(0, 0) ? v1 : Point(0, 0) - v1;
+		v2 = v2 < Point(0, 0) ? v2 : Point(0, 0) - v2;
 		double angleless = v1.cross(v2);
 		if (angleless != 0)
 			return (E.x > M + 2e-5) ^ (angleless > 0);
@@ -572,14 +572,34 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øĞĞ¶à±ßĞÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 			UC.insert(pi.C.begin(), pi.C.end());
 			auto i_smin = T.find(*UC.begin());
 			auto i_smax = T.find(*UC.rbegin());
-			Line smin = *i_smin;
-			Line smax = *i_smax;
-			auto sl = --i_smin;
-			auto sr = ++i_smax;
+
+
+			auto sl = i_smin;
+			--sl;
+			auto sr = i_smax;
+			++sr;
+
+			auto j_smin = i_smin;
+			auto j_smax = i_smax;
+			auto e_sl = sl;
+			auto e_sr = sr;
+			while (j_smin != sr && (j_smin->Q - j_smin->P).cross(i_smin->Q - i_smin->P) < 1e-12)
+				j_smin++;
+			while (j_smax != sl && (j_smax->Q - j_smax->P).cross(i_smax->Q - i_smax->P) < 1e-12)
+				j_smax--;
+			while (e_sl != T.end() && (e_sl->Q - e_sl->P).cross(sl->Q - sl->P) < 1e-12)
+				e_sl--;
+			while (e_sr != T.end() && (e_sr->Q - e_sr->P).cross(sr->Q - sr->P) < 1e-12)
+				e_sr++;
+
 			if (sl != T.end())
-				findNextEvent(*sl, smin, p, Q);
+				for (auto it = i_smin; it != j_smin; it++)
+					for (auto jt = sl; jt != e_sl; jt--)
+						findNextEvent(*jt, *it, p, Q);
 			if (sr != T.end())
-				findNextEvent(smax, *sr, p, Q);
+				for (auto it = i_smax; it != j_smax; it--)
+					for (auto jt = sr; jt != e_sr; jt++)
+						findNextEvent(*it, *jt, p, Q);
 		}
 		//working
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
@@ -833,7 +853,7 @@ Yin::Yin(list<list<Point>>& segments)
 		si[*beta->rbegin()].I.remove(beta);
 		list<Polygon> atom;
 		Jor.split(atom);
-		spadjor.insert(spadjor.end(), atom.begin(),atom.end());
+		spadjor.insert(spadjor.end(), atom.begin(), atom.end());
 	}
 
 }
