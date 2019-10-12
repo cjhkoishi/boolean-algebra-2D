@@ -180,7 +180,20 @@ bool Line::operator<(const Line rhs) const
 	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
 	if (abs(M - N) > 1e-5)
 		return M < N;
-	else if (isParallel2)
+	else {
+		Point v1 = Q - P;
+		Point v2 = rhs.Q - rhs.P;
+		v1 = v1 < Point(0, 0) ? v1: Point(0, 0) - v1;
+		v2 = v2 < Point(0, 0) ? v2: Point(0, 0) - v2;
+		double angleless = v1.cross(v2);
+		if (angleless != 0)
+			return (E.x > M + 2e-5) ^ (angleless > 0);
+		else if (P == rhs.P && Q == rhs.Q)
+			return ID < rhs.ID;
+		else
+			return P < rhs.P || P == rhs.P && Q < rhs.Q;
+	}
+	/*else if (isParallel2)
 		return !isParallel1;
 	else if (isParallel1)
 		return false;
@@ -193,7 +206,7 @@ bool Line::operator<(const Line rhs) const
 			return ID < rhs.ID;
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
-	}
+	}*/
 }
 
 bool Line::operator==(const Line rhs) const
@@ -525,14 +538,11 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 	{
 		Point p = Q.rbegin()->first;
 		PointInfo pi = Q[p];
-		Q.erase(--Q.end());
+
 		//working
 
 
-		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
-		{
-			intersections[p] = pi;
-		}
+
 
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
@@ -572,6 +582,11 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 				findNextEvent(smax, *sr, p, Q);
 		}
 		//working
+		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
+		{
+			intersections[p] = Q[p];
+		}
+		Q.erase(--Q.end());
 	}
 
 	//≤Â»Î&±Íº«

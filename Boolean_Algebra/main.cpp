@@ -60,8 +60,8 @@ int main1()
 	Y2.load(s2, 10);
 	Y1.move(Point(180, 0));
 	Yin Y3 = Y1.meet(Y2);
-	drawYin(img, Y1, 1);
-	drawYin(img, Y2, 1);
+	//drawYin(img, Y1, 1);
+	//drawYin(img, Y2, 1);
 
 	drawYin(img, Y3, 0);
 
