@@ -196,7 +196,7 @@ bool Line::operator<(const Line rhs) const
 	bool isParallel2 = rhs.P.y == rhs.Q.y;
 	double M = isParallel1 ? E.x : P.x + (Q.x - P.x) * (P.y - E.y) / (P.y - Q.y);
 	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
-	if (abs(M - N) > 1e-5)
+	if (abs(M - N) > 1e-9)
 		return M < N;
 	else {
 		Point v1 = Q - P;
@@ -205,7 +205,7 @@ bool Line::operator<(const Line rhs) const
 		v2 = v2 < Point(0, 0) ? v2 : Point(0, 0) - v2;
 		double angleless = v1.cross(v2);
 		if (angleless != 0)
-			return (E.x > M + 2e-5) ^ (angleless > 0);
+			return (E.x > M + 2e-9) ^ (angleless > 0);
 		else if (P == rhs.P && Q == rhs.Q)
 			return ID < rhs.ID;
 		else
@@ -565,14 +565,14 @@ void Yin::intersect(Yin& obj)//¹¦ÄÜ£º½øĞĞ¶à±ßĞÎÏà½»Ëã·¨£¬»ñµÃ·ÇÁ¬½Óµã½»µã£¬²¢²åÈ
 	while (!Q.empty())
 	{
 		Point p = Q.rbegin()->first;
-		PointInfo pi = Q[p];
+		PointInfo& pi = Q[p];
 
 		//working
 		for (auto i = T.begin(); i != T.end(); i++) {
 			if (i->isInside(p) && find(pi.C.begin(), pi.C.end(), *i) == pi.C.end())
-				Q[p].C.push_back(*i);
+				pi.C.push_back(*i);
 		}
-
+		
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
@@ -699,7 +699,7 @@ bool Yin::onTestInv(Point c, Point d)
 	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 		Polygon::Vertex* j = i->head;
 		do {
-			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) < 0)
+			if (c == j->p && abs((d - c).cross(j->last->p - c)) < 1e-12 && (d - c) * (j->last->p - c) > 0)
 				return true;
 			j = j->next;
 		} while (j != i->head);

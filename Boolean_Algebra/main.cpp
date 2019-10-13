@@ -15,6 +15,33 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
+int main2 () {
+
+	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
+
+	Polygon PL1, PL2;
+	PL1.append(Point(0, 50));
+	PL1.append(Point(100, 50));
+	PL1.append(Point(100, 200));
+	PL1.append(Point(0, 200));
+
+	PL2.append(Point(100, 0));
+	PL2.append(Point(200, 0));
+	PL2.append(Point(200, 150));
+	PL2.append(Point(100, 150));
+	Y1.append(PL1);
+	Y2.append(PL2);
+
+	Yin Y3 = Y1.join(Y2);
+	//Y1.intersect(Y2);
+	drawYin(img, Y3, 0);
+
+	cv::imshow("test", img);
+	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
+	cv::waitKey(0);
+	return 0;
+}
+
 int main1() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
@@ -22,17 +49,18 @@ int main1() {
 	Polygon PL1, PL2;
 	PL1.append(Point(0, 50));
 	PL1.append(Point(100, 50));
-	PL1.append(Point(100, 100));
-	PL1.append(Point(0, 100));
+	PL1.append(Point(100, 200));
+	PL1.append(Point(0, 200));
 
 	PL2.append(Point(100, 0));
 	PL2.append(Point(200, 0));
-	PL2.append(Point(200, 100));
-	PL2.append(Point(100, 100));
+	PL2.append(Point(200, 150));
+	PL2.append(Point(100, 150));
 	Y1.append(PL1);
 	Y2.append(PL2);
 
 	Yin Y3 = Y1.meet(Y2);
+	//Y1.intersect(Y2);
 	drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
@@ -58,13 +86,13 @@ int main()
 	}
 	Y1.load(s1, 6);
 	Y2.load(s2, 10);
-	Y1.move(Point(100, 0));
-	Yin Y3 = Y1.join(Y2);
-	//Y1.intersect(Y2);
-	drawYin(img, Y1, 1);
-	drawYin(img, Y2, 1);
+	Y1.move(Point(323, 0));
+	//Yin Y3 = Y1.join(Y2);
+	Y1.intersect(Y2);
+	drawYin(img, Y1, 0);
+	drawYin(img, Y2, 0);
 
-	drawYin(img, Y3, 0);
+	//drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
