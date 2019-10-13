@@ -160,7 +160,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 			}
 		}
 	}
-	else if ((L1.P - L2.P).cross(v) == 0) {
+	/*else if ((L1.P - L2.P).cross(v) == 0) {
 		bool isIn[4];
 		Point endpoint[4] = { L1.P,L1.Q,L2.P,L2.Q };
 		isIn[0] = (L1.P < L2.P ^ L1.P < L2.Q) && !(L1.P == L2.P || L1.P == L2.Q);
@@ -177,7 +177,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 				if (CF)
 					pi.C.push_back(tkl);
 			}
-	}
+	}*/
 }
 
 double mod(double a, double b)
@@ -603,6 +603,17 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			for (auto it = left.first; it != left.second; it--)
 				for (auto jt = right.first; jt != right.second; jt++)
 					findNextEvent(*it, *jt, p, Q);
+					
+			/*auto sl = T.begin();
+			auto sr = T.begin();
+			T.insert(*pi.L.begin());
+			sl = sr = T.find(*pi.L.begin());
+			sl--;
+			sr++;
+			T.erase(*pi.L.begin());
+
+			if (sl != T.end() && sr != T.end())
+				findNextEvent(*sl, *sr, p, Q);*/
 		}
 		else {
 			set<Line> UC;
@@ -620,7 +631,6 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 				findNextEvent(smax, *sr, p, Q);
 		}
 		//working
-		pi = Q[p];
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
 			intersections[p] = pi;
