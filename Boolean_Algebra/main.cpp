@@ -8,6 +8,7 @@ void drawPoint(cv::Mat img, Point P);
 void drawLine(cv::Mat img, Line L);
 void drawPolygon(cv::Mat img, Polygon PL);
 void drawYin(cv::Mat img, Yin& Y, int mode);
+Point transform(Point p);
 
 void slideBar(int val, void*);
 
@@ -15,7 +16,7 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
-int main2 () {
+int main2() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
@@ -42,24 +43,27 @@ int main2 () {
 	return 0;
 }
 
-int main1() {
+int main() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
-	Polygon PL1, PL2;
-	PL1.append(Point(0, 50));
+	Polygon PL1, PL2, PL3;
+	PL1.append(Point(50, 0));
+	PL1.append(Point(50, 50));
 	PL1.append(Point(100, 50));
-	PL1.append(Point(100, 200));
-	PL1.append(Point(0, 200));
+	PL1.append(Point(100, 100));
+	PL1.append(Point(0, 100));
+	PL1.append(Point(0, 0));
 
+
+	PL2.append(Point(50, 0));
 	PL2.append(Point(100, 0));
-	PL2.append(Point(200, 0));
-	PL2.append(Point(200, 150));
-	PL2.append(Point(100, 150));
+	PL2.append(Point(100, 50));
+
 	Y1.append(PL1);
 	Y2.append(PL2);
 
-	Yin Y3 = Y1.meet(Y2);
+	Yin Y3 = Y1.join(Y2);
 	//Y1.intersect(Y2);
 	drawYin(img, Y3, 0);
 
@@ -69,7 +73,7 @@ int main1() {
 	return 0;
 }
 
-int main()
+int main1()
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	stringstream ss;
@@ -88,9 +92,10 @@ int main()
 	Y2.load(s2, 10);
 	Y1.move(Point(323, 0));
 	//Yin Y3 = Y1.join(Y2);
-	Y1.intersect(Y2);
+	//Y1.intersect(Y2);
 	drawYin(img, Y1, 0);
 	drawYin(img, Y2, 0);
+	//drawPoint(img, Point( 516.90929000000006 ,334.30691999999999 ));
 
 	//drawYin(img, Y3, 0);
 
@@ -102,11 +107,14 @@ int main()
 
 void drawPoint(cv::Mat img, Point P)
 {
+	P = transform(P);
 	cv::circle(img, cv::Point((int)P.x, (int)P.y), 3, cv::Scalar(0, 0, 255), -1);
 }
 
 void drawLine(cv::Mat img, Line L)
 {
+	L.P = transform(L.P);
+	L.Q = transform(L.Q);
 	cv::line(img, cv::Point((int)L.P.x, (int)L.P.y), cv::Point((int)L.Q.x, (int)L.Q.y), cv::Scalar(255, 255, 255), 1, 16);
 }
 
@@ -143,6 +151,12 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 			} while (j != i->head);
 		}
 	}
+}
+
+Point transform(Point p)
+{
+	//return Point((p.x - 520.15850999999998) * 1 + 400, (p.y - 331.17763000000002) * 1 + 300);
+	return p;
 }
 
 void slideBar(int val, void*)

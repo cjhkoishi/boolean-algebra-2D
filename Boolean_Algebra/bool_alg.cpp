@@ -148,7 +148,7 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 		bool isEndPoint2 = (intersection == L2.P || intersection == L2.Q);
 		if ((isInsideLine1 || isEndPoint1) && (isInsideLine2 || isEndPoint2))
 		{
-			if (intersection < p || intersection == p)
+			if (intersection < p)
 			{
 				PointInfo& pi = Q[intersection];
 				bool CF1 = find(pi.C.begin(), pi.C.end(), L1) == pi.C.end();
@@ -196,7 +196,7 @@ bool Line::operator<(const Line rhs) const
 	bool isParallel2 = rhs.P.y == rhs.Q.y;
 	double M = isParallel1 ? E.x : P.x + (Q.x - P.x) * (P.y - E.y) / (P.y - Q.y);
 	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
-	if (abs(M - N) > 1e-9)
+	if (abs(M - N) > 1e-4)
 		return M < N;
 	else {
 		Point v1 = Q - P;
@@ -205,7 +205,7 @@ bool Line::operator<(const Line rhs) const
 		v2 = v2 < Point(0, 0) ? v2 : Point(0, 0) - v2;
 		double angleless = v1.cross(v2);
 		if (angleless != 0)
-			return (E.x > M + 2e-9) ^ (angleless > 0);
+			return (E.x < M - 2e-4) ^ (angleless > 0);
 		else if (P == rhs.P && Q == rhs.Q)
 			return ID < rhs.ID;
 		else
@@ -566,11 +566,21 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 	{
 		Point p = Q.rbegin()->first;
 		PointInfo& pi = Q[p];
+		
+		if (p == Point(520.15850999999998 ,331.17763000000002))
+			int ffdfd = 2;
+		if (p == Point(516.90929000000006, 334.30691999999999))
+			int ffdfd = 2;
 
 		//working
 		for (auto i = T.begin(); i != T.end(); i++) {
 			if (i->isInside(p) && find(pi.C.begin(), pi.C.end(), *i) == pi.C.end())
 				pi.C.push_back(*i);
+		}
+				
+		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
+		{
+			intersections[p] = pi;
 		}
 		
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
@@ -582,6 +592,11 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			T.insert(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
+
+		//?
+		bool tteess = Line(520.15850999999998, 331.17763000000002, 513.78760999999997, 337.31324999999998) < Line(516.90929000000006, 334.30691999999999, 514.20901000000003, 330.65724000000000);
+		//?
+
 		if (pi.U.empty() && pi.C.empty())
 		{
 			auto sl = T.begin();
@@ -631,10 +646,6 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 				findNextEvent(smax, *sr, p, Q);
 		}
 		//working
-		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
-		{
-			intersections[p] = pi;
-		}
 		Q.erase(--Q.end());
 	}
 
