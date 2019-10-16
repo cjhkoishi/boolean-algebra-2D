@@ -63,30 +63,30 @@ int main3() {
 	return 0;
 }
 
-int main() {
+int main1() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
-	Polygon PL1, PL2,PL3;
-	PL1.append(Point(0, 100));
-	PL1.append(Point(100, 100));
-	PL1.append(Point(100, 200));
-	PL1.append(Point(0, 200));
+	Polygon PL1, PL2, PL3;
+	PL1.append(Point(0, 10));
+	PL1.append(Point(100, 10));
+	PL1.append(Point(100, 210));
+	PL1.append(Point(0, 210));
 
-	PL2.append(Point(100, 0));
-	PL2.append(Point(400, 0));
-	PL2.append(Point(400, 300));
-	PL2.append(Point(100, 300));
+	PL2.append(Point(100, 10));
+	PL2.append(Point(400, 10));
+	PL2.append(Point(400, 310));
+	PL2.append(Point(100, 310));
 
-	PL3.append(Point(200, 100));
-	PL3.append(Point(200, 200));
-	PL3.append(Point(300, 200));
-	PL3.append(Point(300,100));
+	PL3.append(Point(200, 110));
+	PL3.append(Point(200, 230));
+	PL3.append(Point(300, 210));
+	PL3.append(Point(300, 110));
 	Y1.append(PL1);
 	Y2.append(PL2);
 	Y2.append(PL3);
 
-	Y1.move(Point(0,0));
+	Y1.move(Point(196, 0));
 	Yin Y3 = Y1.join(Y2);
 	//Y1.intersect(Y2);
 	drawYin(img, Y3, 0);
@@ -97,7 +97,7 @@ int main() {
 	return 0;
 }
 
-int main1() {
+int main2() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
@@ -128,7 +128,7 @@ int main1() {
 	return 0;
 }
 
-int main2()
+int main()
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	stringstream ss;

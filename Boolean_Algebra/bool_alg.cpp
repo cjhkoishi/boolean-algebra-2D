@@ -37,7 +37,7 @@ double Point::norm()
 
 bool Point::operator<(const Point rhs) const
 {
-	return (y == rhs.y) ? (x > rhs.x) : (y < rhs.y);
+	return ((y == rhs.y) ? (x > rhs.x) : (y < rhs.y))&&!(*this==rhs);
 }
 
 bool Point::operator==(const Point rhs) const
