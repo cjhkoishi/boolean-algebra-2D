@@ -16,23 +16,30 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
-int main2() {
+int main() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
-	Polygon PL1, PL2;
-	PL1.append(Point(0, 50));
-	PL1.append(Point(100, 50));
+	Polygon PL1, PL2,PL3;
+	PL1.append(Point(0, 100));
+	PL1.append(Point(100, 100));
 	PL1.append(Point(100, 200));
 	PL1.append(Point(0, 200));
 
 	PL2.append(Point(100, 0));
-	PL2.append(Point(200, 0));
-	PL2.append(Point(200, 150));
-	PL2.append(Point(100, 150));
+	PL2.append(Point(400, 0));
+	PL2.append(Point(400, 300));
+	PL2.append(Point(100, 300));
+
+	PL3.append(Point(200, 100));
+	PL3.append(Point(200, 200));
+	PL3.append(Point(300, 200));
+	PL3.append(Point(300,100));
 	Y1.append(PL1);
 	Y2.append(PL2);
+	Y2.append(PL3);
 
+	Y1.move(Point(250,0));
 	Yin Y3 = Y1.join(Y2);
 	//Y1.intersect(Y2);
 	drawYin(img, Y3, 0);
@@ -43,7 +50,7 @@ int main2() {
 	return 0;
 }
 
-int main() {
+int main1() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 
@@ -59,6 +66,7 @@ int main() {
 	PL2.append(Point(50, 0));
 	PL2.append(Point(100, 0));
 	PL2.append(Point(100, 50));
+	PL2.append(Point(50, 50));
 
 	Y1.append(PL1);
 	Y2.append(PL2);
@@ -73,7 +81,7 @@ int main() {
 	return 0;
 }
 
-int main1()
+int main2()
 {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
 	stringstream ss;
@@ -90,14 +98,14 @@ int main1()
 	}
 	Y1.load(s1, 6);
 	Y2.load(s2, 10);
-	Y1.move(Point(323, 0));
-	//Yin Y3 = Y1.join(Y2);
+	Y1.move(Point(100, 0));
+	Yin Y3 = Y1.meet(Y2);
 	//Y1.intersect(Y2);
-	drawYin(img, Y1, 0);
-	drawYin(img, Y2, 0);
+	drawYin(img, Y1, 1);
+	drawYin(img, Y2, 1);
 	//drawPoint(img, Point( 516.90929000000006 ,334.30691999999999 ));
 
-	//drawYin(img, Y3, 0);
+	drawYin(img, Y3, 0);
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);

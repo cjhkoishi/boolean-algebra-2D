@@ -37,7 +37,7 @@ bool Point::operator<(const Point rhs) const
 
 bool Point::operator==(const Point rhs) const
 {
-	return (abs(x - rhs.x) < 1e-9) && (abs(y - rhs.y) < 1e-9);
+	return (abs(x - rhs.x) < 1e-8) && (abs(y - rhs.y) < 1e-8);
 }
 
 Point::Point() :x(0), y(0)
@@ -566,11 +566,6 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 	{
 		Point p = Q.rbegin()->first;
 		PointInfo& pi = Q[p];
-		
-		if (p == Point(520.15850999999998 ,331.17763000000002))
-			int ffdfd = 2;
-		if (p == Point(516.90929000000006, 334.30691999999999))
-			int ffdfd = 2;
 
 		//working
 		for (auto i = T.begin(); i != T.end(); i++) {
@@ -593,9 +588,6 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
 
-		//?
-		bool tteess = Line(520.15850999999998, 331.17763000000002, 513.78760999999997, 337.31324999999998) < Line(516.90929000000006, 334.30691999999999, 514.20901000000003, 330.65724000000000);
-		//?
 
 		if (pi.U.empty() && pi.C.empty())
 		{
