@@ -19,6 +19,7 @@ public:
 	double operator*(const Point rhs)const;
 	double cross(const Point rhs)const;
 	friend Point operator*(double t, const Point rhs);
+	double norm();
 
 	bool operator<(const Point rhs)const;//字典序
 	bool operator==(const Point rhs)const;//控制浮点精度的影响
@@ -68,6 +69,7 @@ public:
 	void append(Point c);//在head顶点之前插入一个顶点
 	void refreshOri();//计算定向并刷新变量
 
+	int postion(Point c);
 	void reverse();
 	bool split(list<Polygon>& result);
 
@@ -89,6 +91,8 @@ public:
 	Yin join(Yin rhs);
 
 	void intersect(Yin& obj);//求多边形集合的交点，并插入新交点数据
+	int postion(Point c);//0：外部 1：内部 2：属于
+	int postion(Point c, Point d);//0：内部 1：外部 2：包含并同向 3：包含并异向
 	bool interiorTest(Point c);//Yin set的内部检测
 	bool onTest(Point c, Point d);//有向线段cd是否与多边形重合且同向
 	bool onTestInv(Point c, Point d);//有向线段cd是否与多边形重合且逆向

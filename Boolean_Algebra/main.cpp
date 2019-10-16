@@ -16,6 +16,53 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
+int main3() {
+	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
+	Polygon PL1, PL2, PL3;
+	PL1.append(Point(0, 100));
+	PL1.append(Point(100, 100));
+	PL1.append(Point(100, 200));
+	PL1.append(Point(0, 200));
+
+	PL2.append(Point(300, 0));
+	PL2.append(Point(500, 200));
+	PL2.append(Point(300, 400));
+	PL2.append(Point(100, 200));
+
+	PL3.append(Point(300, 100));
+	PL3.append(Point(200, 200));
+	PL3.append(Point(300, 300));
+	PL3.append(Point(400, 200));
+	Y1.append(PL1);
+	Y2.append(PL2);
+	Y2.append(PL3);
+
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			int r = Y2.postion(Point(j, i));
+			switch (r)
+			{
+			case 0:
+				img.at<cv::Vec3b>(i, j) += cv::Vec3b(0, 0, 0);
+				break;
+			case 1:
+				img.at<cv::Vec3b>(i, j) += cv::Vec3b(64, 64, 64);
+				break;
+			case 2:
+				img.at<cv::Vec3b>(i, j) += cv::Vec3b(0, 0, 255);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	cv::imshow("test", img);
+	cv::waitKey(0);
+
+	return 0;
+}
+
 int main() {
 
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
@@ -39,7 +86,7 @@ int main() {
 	Y2.append(PL2);
 	Y2.append(PL3);
 
-	Y1.move(Point(250,0));
+	Y1.move(Point(0,0));
 	Yin Y3 = Y1.join(Y2);
 	//Y1.intersect(Y2);
 	drawYin(img, Y3, 0);

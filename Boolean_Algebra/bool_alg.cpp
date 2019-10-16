@@ -30,6 +30,11 @@ double Point::cross(const Point rhs) const
 	return x * rhs.y - y * rhs.x;
 }
 
+double Point::norm()
+{
+	return sqrt(x * x + y * y);
+}
+
 bool Point::operator<(const Point rhs) const
 {
 	return (y == rhs.y) ? (x > rhs.x) : (y < rhs.y);
@@ -236,10 +241,12 @@ bool Line::isSameLine(const Line rhs)const
 
 bool Line::isInside(Point c)const
 {
-	Point b = c - Q;
-	Point d = P - Q;
-	Point proj = (b * d / (sqrt(b.x * b.x + b.y * b.y) * sqrt(d.x * d.x + d.y * d.y))) * b + Q;
-	return c == proj && (proj < P ^ proj < Q) && !(proj == P) && !(proj == Q);
+	Point v1 = P - c;
+	Point v2 = Q - c;
+	Point w = Q - P;
+	double dist = abs(v1.cross(w) / w.norm());
+	bool closed = dist < 1e-8 && v1 * w <= 0 && v2 * w >= 0;
+	return closed && !(c == P) && !(c == Q);
 }
 
 Line::Line()
@@ -321,6 +328,47 @@ void Polygon::refreshOri()
 		Point v2 = sidePoint->next->p - sidePoint->p;
 		orientation = v1.cross(v2) > 0;
 	}
+}
+
+int Polygon::postion(Point c)
+{
+	Vertex* i = head;
+	if (i == 0) {
+		return orientation;
+	}
+	int cn = 0;
+	bool flag = false;
+	do {
+		Line l(i->p, i->next->p);
+		Point v1 = l.P - c;
+		Point v2 = l.Q - c;
+		Point w = v2 - v1;
+		if (l.isInside(c) || c == l.P || c == l.Q) {
+			flag = true;
+			break;
+		}
+		if (v1.y * v2.y <= 0 && w.y != 0)
+		{
+			bool dir = w.y > 0;
+			double s = -v1.cross(w);
+			double t = -v1.y;
+			bool uptest = dir && s > 0 && t >= 0 && t < w.y;
+			bool downtest = !dir && s < 0 && t < 0 && t >= w.y;
+			if (uptest || downtest)
+				cn++;
+			/*double t = -v1.y / w.y;
+			double s = -v1.cross(w) / w.y;
+			if (s > 0)
+			{
+				if (t >= 0 && t < 1 && w.y>0)
+					cn++;
+				else if (t > 0 && t <= 1 && w.y < 0)
+					cn--;
+			}*/
+		}
+		i = i->next;
+	} while (i != head);
+	return flag ? 2 : abs(cn) % 2;
 }
 
 void Polygon::reverse()
@@ -477,20 +525,15 @@ Yin Yin::meet(Yin rhs)
 	for (auto i = out1.begin(); i != out1.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
-		Point testp = 0.5 * (c + d);
-		bool isInterior = rhs.interiorTest(testp);
-		bool isCoincide = rhs.onTest(c, d);
-		if (isInterior || isCoincide)
+		int r = rhs.postion(c,d);
+		if (r==1||r==2)
 			fin.push_back(*i);
 	}
 	for (auto i = out2.begin(); i != out2.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
-		Point testp = 0.5 * (c + d);
-		bool isInterior = lhs.interiorTest(testp);
-		bool isCoincide = lhs.onTest(c, d);
-		bool isInv = lhs.onTestInv(c, d);
-		if (isInterior && !isCoincide && !isInv)
+		int r = lhs.postion(c, d);
+		if (r==1)
 			fin.push_back(*i);
 	}
 
@@ -572,12 +615,12 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			if (i->isInside(p) && find(pi.C.begin(), pi.C.end(), *i) == pi.C.end())
 				pi.C.push_back(*i);
 		}
-				
+
 		if (pi.C.size() > 0 || pi.L.size() + pi.U.size() > 2)
 		{
 			intersections[p] = pi;
 		}
-		
+
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
@@ -591,7 +634,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 
 		if (pi.U.empty() && pi.C.empty())
 		{
-			auto sl = T.begin();
+			/*auto sl = T.begin();
 			auto sr = T.begin();
 			T.insert(*pi.L.begin());
 			sl = sr = T.find(*pi.L.begin());
@@ -609,9 +652,9 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 
 			for (auto it = left.first; it != left.second; it--)
 				for (auto jt = right.first; jt != right.second; jt++)
-					findNextEvent(*it, *jt, p, Q);
-					
-			/*auto sl = T.begin();
+					findNextEvent(*it, *jt, p, Q);*/
+
+			auto sl = T.begin();
 			auto sr = T.begin();
 			T.insert(*pi.L.begin());
 			sl = sr = T.find(*pi.L.begin());
@@ -620,7 +663,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			T.erase(*pi.L.begin());
 
 			if (sl != T.end() && sr != T.end())
-				findNextEvent(*sl, *sr, p, Q);*/
+				findNextEvent(*sl, *sr, p, Q);
 		}
 		else {
 			set<Line> UC;
@@ -679,6 +722,40 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 			end->last = nv;
 			start = nv;
 		}
+	}
+}
+
+int Yin::postion(Point c)
+{
+	if (spadjor.empty())
+		return sign;
+	bool res = false;
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		int b = i->postion(c);
+		if (b == 2)
+			return 2;
+		res ^= b;
+	}
+	return res ^ sign;
+}
+
+int Yin::postion(Point c, Point d)
+{
+	Point center = 0.5 * (c + d);
+	int r = postion(center);
+	if (r != 2)
+		return r;
+	else
+	{
+		for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+			Polygon::Vertex* j = i->head;
+			do {
+				if (c == j->p && (d - c) * (j->next->p - c) > 0)
+					return 2;
+				j = j->next;
+			} while (j != i->head);
+		}
+		return 3;
 	}
 }
 
