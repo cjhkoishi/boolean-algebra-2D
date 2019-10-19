@@ -37,12 +37,12 @@ double Point::norm()
 
 bool Point::operator<(const Point rhs) const
 {
-	return ((y == rhs.y) ? (x > rhs.x) : (y < rhs.y))&&!(*this==rhs);
+	return ((y == rhs.y) ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
 }
 
 bool Point::operator==(const Point rhs) const
 {
-	return (abs(x - rhs.x) < 1e-8) && (abs(y - rhs.y) < 1e-8);
+	return (abs(x - rhs.x) < 1e-10) && (abs(y - rhs.y) < 1e-10);
 }
 
 Point::Point() :x(0), y(0)
@@ -201,7 +201,7 @@ bool Line::operator<(const Line rhs) const
 	bool isParallel2 = rhs.P.y == rhs.Q.y;
 	double M = isParallel1 ? E.x : P.x + (Q.x - P.x) * (P.y - E.y) / (P.y - Q.y);
 	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
-	if (abs(M - N) > 1e-4)
+	if (abs(M - N) > 1e-6)
 		return M < N;
 	else {
 		Point v1 = Q - P;
@@ -210,7 +210,7 @@ bool Line::operator<(const Line rhs) const
 		v2 = v2 < Point(0, 0) ? v2 : Point(0, 0) - v2;
 		double angleless = v1.cross(v2);
 		if (angleless != 0)
-			return (E.x < M - 2e-4) ^ (angleless > 0);
+			return (E.x < M - 2e-6) ^ (angleless > 0);
 		else if (P == rhs.P && Q == rhs.Q)
 			return ID < rhs.ID;
 		else
@@ -234,18 +234,13 @@ bool Line::operator==(const Line rhs) const
 	return P == rhs.P && Q == rhs.Q;
 }
 
-bool Line::isSameLine(const Line rhs)const
-{
-	return (P - Q).cross(rhs.P - rhs.Q) < 1e-12 && (P - rhs.P).cross(P - Q) < 1e-12;
-}
-
 bool Line::isInside(Point c)const
 {
 	Point v1 = P - c;
 	Point v2 = Q - c;
 	Point w = Q - P;
 	double dist = abs(v1.cross(w) / w.norm());
-	bool closed = dist < 1e-8 && v1 * w <= 0 && v2 * w >= 0;
+	bool closed = dist < 1e-10 && v1 * w <= 0 && v2 * w >= 0;
 	return closed && !(c == P) && !(c == Q);
 }
 
@@ -265,34 +260,6 @@ Line::~Line()
 {
 }
 
-
-bool Polygon::interiorTest(Point c)
-{
-	Vertex* i = head;
-	if (i == 0) {
-		return orientation;
-	}
-	int cn = 0;
-	do {
-		Point v1 = i->p - c;
-		Point v2 = i->next->p - c;
-		Point w = v2 - v1;
-		if (w.y != 0)
-		{
-			double t = -v1.y / w.y;
-			double s = -v1.cross(w) / w.y;
-			if (s > 0)
-			{
-				if (t >= 0 && t < 1 && w.y>0)
-					cn++;
-				else if (t > 0 && t <= 1 && w.y < 0)
-					cn--;
-			}
-		}
-		i = i->next;
-	} while (i != head);
-	return abs(cn) % 2 == 1;
-}
 
 void Polygon::append(Point c)
 {
@@ -343,11 +310,16 @@ int Polygon::postion(Point c)
 		Point v1 = l.P - c;
 		Point v2 = l.Q - c;
 		Point w = v2 - v1;
+		if (v1.y * v2.y > 0) {
+			i = i->next;
+			continue;
+		}
+
 		if (l.isInside(c) || c == l.P || c == l.Q) {
 			flag = true;
 			break;
 		}
-		if (v1.y * v2.y <= 0 && w.y != 0)
+		if (w.y != 0)
 		{
 			bool dir = w.y > 0;
 			double s = -v1.cross(w);
@@ -356,16 +328,8 @@ int Polygon::postion(Point c)
 			bool downtest = !dir && s < 0 && t < 0 && t >= w.y;
 			if (uptest || downtest)
 				cn++;
-			/*double t = -v1.y / w.y;
-			double s = -v1.cross(w) / w.y;
-			if (s > 0)
-			{
-				if (t >= 0 && t < 1 && w.y>0)
-					cn++;
-				else if (t > 0 && t <= 1 && w.y < 0)
-					cn--;
-			}*/
 		}
+
 		i = i->next;
 	} while (i != head);
 	return flag ? 2 : abs(cn) % 2;
@@ -451,10 +415,9 @@ Polygon::Polygon(string filename)
 		buffer.push_back(input);
 	}
 	f.close();
-	int n = buffer.size() / 2;
+	int n = (int)buffer.size() / 2;
 	for (int i = 0; i < n - 1; i++) {
-		//Point p((buffer[i] * 100 - 84.88986354429699-400)*20+400, (buffer[n + i] * 100 - 23.22797462977070-300)*20+300);
-		Point p(buffer[i] * 100 + 50, buffer[n + i] * 100 + 50);
+		Point p(buffer[i], buffer[n + i]);
 		append(p);
 	}
 }
@@ -525,15 +488,15 @@ Yin Yin::meet(Yin rhs)
 	for (auto i = out1.begin(); i != out1.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
-		int r = rhs.postion(c,d);
-		if (r==1||r==2)
+		int r = rhs.postion(c, d);
+		if (r == 1 || r == 2)
 			fin.push_back(*i);
 	}
 	for (auto i = out2.begin(); i != out2.end(); i++) {
 		Point c = *i->begin();
 		Point d = *(++i->begin());
 		int r = lhs.postion(c, d);
-		if (r==1)
+		if (r == 1)
 			fin.push_back(*i);
 	}
 
@@ -734,9 +697,9 @@ int Yin::postion(Point c)
 		int b = i->postion(c);
 		if (b == 2)
 			return 2;
-		res ^= b;
+		res ^= (b == 1);
 	}
-	return res ^ sign;
+	return (res ^ sign) ? 1 : 0;
 }
 
 int Yin::postion(Point c, Point d)
@@ -759,43 +722,6 @@ int Yin::postion(Point c, Point d)
 	}
 }
 
-bool Yin::interiorTest(Point c)
-{
-	if (spadjor.empty())
-		return sign;
-	bool res = false;
-	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
-		bool b = i->interiorTest(c);
-		res ^= b;
-	}
-	return res ^ sign;
-}
-
-bool Yin::onTest(Point c, Point d)
-{
-	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
-		Polygon::Vertex* j = i->head;
-		do {
-			if (c == j->p && abs((d - c).cross(j->next->p - c)) < 1e-12 && (d - c) * (j->next->p - c) > 0)
-				return true;
-			j = j->next;
-		} while (j != i->head);
-	}
-	return false;
-}
-
-bool Yin::onTestInv(Point c, Point d)
-{
-	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
-		Polygon::Vertex* j = i->head;
-		do {
-			if (c == j->p && abs((d - c).cross(j->last->p - c)) < 1e-12 && (d - c) * (j->last->p - c) > 0)
-				return true;
-			j = j->next;
-		} while (j != i->head);
-	}
-	return false;
-}
 
 void Yin::cut(list<list<Point>>& out)
 {
@@ -848,7 +774,7 @@ void Yin::append(Polygon PL)
 {
 	PL.refreshOri();
 	bool ori = PL.orientation;
-	if (!interiorTest(PL.head->p) ^ ori)
+	if ((postion(PL.head->p) == 0) ^ ori)
 		PL.reverse();
 	PL.refreshOri();
 	spadjor.push_back(PL);
@@ -863,6 +789,24 @@ void Yin::clearLabel()
 			j = j->next;
 		} while (j != i->head);
 	}
+}
+
+void Yin::resetSign()
+{
+	if (spadjor.empty())
+		return;
+	auto m = spadjor.begin()->head;
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		auto j = i->head;
+		do {
+			if (m->p < j->p)
+				m = j;
+			j = j->next;
+		} while (j != i->head);
+	}
+	Point v1 = m->p - m->last->p;
+	Point v2 = m->next->p - m->p;
+	sign = v1.cross(v2) < 0;
 }
 
 void Yin::load(string datafiles[], int num)
@@ -882,6 +826,75 @@ void Yin::move(Point p)
 			j = j->next;
 		} while (j != i->head);
 	}
+}
+
+void Yin::OutPut(string filename)
+{
+	int n = 0;
+	stringstream ss;
+	fstream f(filename, ios::out);
+	f << setprecision(16);
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		ss.str("");
+		ss << filename << ++n << ".txt";
+
+		Polygon::Vertex* j = i->head;
+		do {
+			f << j->p.x << " ";
+			j = j->next;
+		} while (j != i->head);
+		f << j->p.x << endl;
+		do {
+			f << j->p.y << " ";
+			j = j->next;
+		} while (j != i->head);
+		f << j->p.y << endl;
+
+	}
+	f.close();
+}
+
+void Yin::InPut(string filename)
+{
+	spadjor.clear();
+	fstream f(filename, ios::in);
+	stringstream ss;
+	string str;
+	while (getline(f, str))
+	{
+		ss.clear();
+		ss.str(str);
+		vector<double> xs, ys;
+		double number;
+		while (true) {
+			ss >> number;
+			if (ss.fail())
+				break;
+			xs.push_back(number);
+		}
+		getline(f, str);
+		ss.clear();
+		ss.str(str);
+		while (true) {
+			ss >> number;
+			if (ss.fail())
+				break;
+			ys.push_back(number);
+		}
+		if (xs.size() != ys.size())
+		{
+			spadjor.clear();
+			return;
+		}
+		else if (xs.size() == 0)
+			return;
+		spadjor.push_back(Polygon());
+		auto Jor = --spadjor.end();
+		for (int i = 0; i < xs.size() - 1; i++) {
+			Jor->append(Point(xs[i], ys[i]));
+		}
+	}
+	resetSign();
 }
 
 Yin::Yin()

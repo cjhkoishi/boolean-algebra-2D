@@ -1,12 +1,14 @@
 #pragma once
 #include<iostream>
 #include<fstream>
+#include<sstream>
 #include<list>
 #include<vector>
 #include<set>
 #include<unordered_set>
 #include<map>
 #include<algorithm>
+#include <iomanip>
 using namespace std;
 
 class Point //点类
@@ -42,7 +44,6 @@ public:
 	bool operator<(const Line rhs)const;//扫描线相关的序结构
 	bool operator==(const Line rhs)const;//无向意义下的相等比较
 
-	bool isSameLine(const Line rhs)const;
 	bool isInside(Point c)const;
 
 	//friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
@@ -65,7 +66,6 @@ public:
 	Vertex* head = 0;//指向双向链表起始节点
 	bool orientation = false;//多边形的绕向，被动变量
 
-	bool interiorTest(Point c);//判断点是否在多边形内部。符号相关
 	void append(Point c);//在head顶点之前插入一个顶点
 	void refreshOri();//计算定向并刷新变量
 
@@ -93,16 +93,16 @@ public:
 	void intersect(Yin& obj);//求多边形集合的交点，并插入新交点数据
 	int postion(Point c);//0：外部 1：内部 2：属于
 	int postion(Point c, Point d);//0：内部 1：外部 2：包含并同向 3：包含并异向
-	bool interiorTest(Point c);//Yin set的内部检测
-	bool onTest(Point c, Point d);//有向线段cd是否与多边形重合且同向
-	bool onTestInv(Point c, Point d);//有向线段cd是否与多边形重合且逆向
 	void cut(list<list<Point>>& out);//利用标记点分割成折线段
 	void getBettiNum(int& b0, int& b1);//计算betti数
 	void append(Polygon PL);//添加多边形
 	void clearLabel();//清空标记点的标记
+	void resetSign();
 
 	void load(string datafiles[], int num);
 	void move(Point p);
+	void OutPut(string filename);
+	void InPut(string filename);
 
 	Yin();
 	Yin(list<list<Point>>& segment);//利用线段集合生成spadjor
