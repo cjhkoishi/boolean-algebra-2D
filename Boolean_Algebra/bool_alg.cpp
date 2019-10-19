@@ -37,7 +37,7 @@ double Point::norm()
 
 bool Point::operator<(const Point rhs) const
 {
-	return ((y == rhs.y) ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
+	return (abs(y - rhs.y)<1e-10 ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
 }
 
 bool Point::operator==(const Point rhs) const
@@ -216,17 +216,6 @@ bool Line::operator<(const Line rhs) const
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
 	}
-	/*else if (isParallel2)
-		return !isParallel1;
-	else if (isParallel1)
-		return false;
-	else {
-		double k1 = (Q.x - P.x) / (P.y - Q.y);
-		double k2 = (rhs.Q.x - rhs.P.x) / (rhs.P.y - rhs.Q.y);
-		if (k1 != k2)
-			return (E.x > M + 2e-5) ^ (k1 < k2);
-		else
-	}*/
 }
 
 bool Line::operator==(const Line rhs) const
