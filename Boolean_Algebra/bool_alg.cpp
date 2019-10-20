@@ -1,12 +1,14 @@
 #define PI 3.14159265358
 #include "bool_alg.h"
 
+double err = 1e-10;
 
 struct PointInfo {
 	list<Line> U;
 	list<Line> L;
 	list<Line> C;
 };
+void findIntersection(list<Line>& lines, map<Point, PointInfo>& intersections);
 void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q);
 double mod(double a, double b);
 
@@ -37,12 +39,12 @@ double Point::norm()
 
 bool Point::operator<(const Point rhs) const
 {
-	return (abs(y - rhs.y) < 1e-10 ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
+	return (abs(y - rhs.y) < err ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
 }
 
 bool Point::operator==(const Point rhs) const
 {
-	return (abs(x - rhs.x) < 1e-10) && (abs(y - rhs.y) < 1e-10);
+	return (abs(x - rhs.x) < err) && (abs(y - rhs.y) < err);
 }
 
 Point::Point() :x(0), y(0)
@@ -67,8 +69,10 @@ ostream& operator<<(ostream& out, const Point& p)
 	return out << "(" << p.x << "," << p.y << ")";
 }
 
-/*void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections)
+void findIntersection(list<Line>& lines, map<Point, PointInfo>& intersections)
 {
+	intersections.clear();
+
 	map<Point, PointInfo> Q;
 	set<Line> T;
 	for (auto i = lines.begin(); i != lines.end(); i++) {
@@ -87,16 +91,19 @@ ostream& operator<<(ostream& out, const Point& p)
 	while (!Q.empty())
 	{
 		Point p = Q.rbegin()->first;
-		PointInfo pi = Q[p];
-		Q.erase(--Q.end());
+		PointInfo& pi = Q[p];
+
 		//working
+		for (auto i = T.begin(); i != T.end(); i++) {
+			if (i->isInside(p) && find(pi.C.begin(), pi.C.end(), *i) == pi.C.end())
+				pi.C.push_back(*i);
+		}
 
 		if (pi.C.size() + pi.L.size() + pi.U.size() > 1)
 		{
-			intersections[p].insert(intersections[p].end(), pi.C.begin(), pi.C.end());
-			intersections[p].insert(intersections[p].end(), pi.L.begin(), pi.L.end());
-			intersections[p].insert(intersections[p].end(), pi.U.begin(), pi.U.end());
+			intersections[p] = pi;
 		}
+
 		for (auto i = pi.L.begin(); i != pi.L.end(); i++)
 			T.erase(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
@@ -106,6 +113,7 @@ ostream& operator<<(ostream& out, const Point& p)
 			T.insert(*i);
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
+
 		if (pi.U.empty() && pi.C.empty())
 		{
 			auto sl = T.begin();
@@ -135,9 +143,10 @@ ostream& operator<<(ostream& out, const Point& p)
 				findNextEvent(smax, *sr, p, Q);
 		}
 		//working
-
+		Q.erase(--Q.end());
 	}
-}*/
+
+}
 
 void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 	Point v = L1.Q - L1.P;
@@ -197,25 +206,6 @@ Point Line::E;
 
 bool Line::operator<(const Line rhs) const
 {
-	/*bool isParallel1 = P.y == Q.y;
-	bool isParallel2 = rhs.P.y == rhs.Q.y;
-	double M = isParallel1 ? E.x : P.x + (Q.x - P.x) * (P.y - E.y) / (P.y - Q.y);
-	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
-	if (abs(M - N) > 1e-6)
-		return M < N;
-	else {
-		Point v1 = Q - P;
-		Point v2 = rhs.Q - rhs.P;
-		v1 = v1 < Point(0, 0) ? v1 : Point(0, 0) - v1;
-		v2 = v2 < Point(0, 0) ? v2 : Point(0, 0) - v2;
-		double angleless = v1.cross(v2);
-		if (angleless != 0)
-			return (E.x < M - 2e-6) ^ (angleless > 0);
-		else if (P == rhs.P && Q == rhs.Q)
-			return ID < rhs.ID;
-		else
-			return P < rhs.P || P == rhs.P && Q < rhs.Q;
-	}*/
 	Point v = P - Q;
 	Point w = rhs.P - rhs.Q;
 	double cm = v.cross(w);
@@ -224,7 +214,7 @@ bool Line::operator<(const Line rhs) const
 		Point inte = t * v + P;
 		bool vd = v < Point(0, 0);
 		bool wd = w < Point(0, 0);
-		bool less=(vd ^ wd) ^ (cm > 0);
+		bool less = (vd ^ wd) ^ (cm > 0);
 		if (inte == E || E < inte)
 			return less;
 		else
@@ -254,7 +244,7 @@ bool Line::isInside(Point c)const
 	Point v2 = Q - c;
 	Point w = Q - P;
 	double dist = abs(v1.cross(w) / w.norm());
-	bool closed = dist < 1e-10 && v1 * w <= 0 && v2 * w >= 0;
+	bool closed = dist < err && v1 * w <= 0 && v2 * w >= 0;
 	return closed && !(c == P) && !(c == Q);
 }
 
@@ -395,6 +385,29 @@ bool Polygon::split(list<Polygon>& result)
 		i = i->next;
 	} while (i != head);
 	return num > 1;
+}
+
+bool Polygon::check()
+{
+	list<Line> lines;
+
+	Polygon::Vertex* i = head;
+	do {
+		Line l(i->p, i->next->p);
+		lines.push_back(l);
+		i = i->next;
+	} while (i != head);
+
+	map<Point, PointInfo> intersections;
+	findIntersection(lines,intersections);
+
+	for (auto i = intersections.begin(); i != intersections.end(); i++) {
+		if (i->second.C.size() > 0 || i->second.U.size() + i->second.L.size() > 2) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 Polygon::Polygon()
@@ -567,7 +580,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 	//º∆À„Ωªµ„
 
 	map<Point, PointInfo> intersections;//Ωªµ„=>À˘ Ùœﬂ∂Œ ”≥…‰
-	map<Point, PointInfo> Q;
+	/*map<Point, PointInfo> Q;
 	set<Line> T;
 	for (auto i = lines.begin(); i != lines.end(); i++) {
 		Point* upper, * lower;
@@ -608,29 +621,8 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 		for (auto i = pi.C.begin(); i != pi.C.end(); i++)
 			T.insert(*i);
 
-
 		if (pi.U.empty() && pi.C.empty())
 		{
-			/*auto sl = T.begin();
-			auto sr = T.begin();
-			T.insert(*pi.L.begin());
-			sl = sr = T.find(*pi.L.begin());
-			sl--;
-			sr++;
-			T.erase(*pi.L.begin());
-
-			pair<set<Line>::iterator, set<Line>::iterator> left, right;
-			left.first = left.second = sl;
-			right.first = right.second = sr;
-			while (left.second != T.end() && left.second->isSameLine(*left.first))
-				left.second--;
-			while (right.second != T.end() && right.second->isSameLine(*right.first))
-				right.second++;
-
-			for (auto it = left.first; it != left.second; it--)
-				for (auto jt = right.first; jt != right.second; jt++)
-					findNextEvent(*it, *jt, p, Q);*/
-
 			auto sl = T.begin();
 			auto sr = T.begin();
 			T.insert(*pi.L.begin());
@@ -659,8 +651,18 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 		}
 		//working
 		Q.erase(--Q.end());
+	}*/
+	findIntersection(lines, intersections);
+	for (auto i = intersections.begin(); i != intersections.end(); ) {
+		if (!(i->second.C.size() > 0 || i->second.U.size() + i->second.L.size() > 2)) {
+			auto j = i;
+			i++;
+			intersections.erase(j);
+		}
+		else {
+			i++;
+		}
 	}
-
 	//≤Â»Î&±Íº«
 	map<Polygon::Vertex*, list<Point>> buffer;
 	for (auto i = intersections.begin(); i != intersections.end(); i++) {
@@ -701,6 +703,7 @@ void Yin::intersect(Yin& obj)//π¶ƒ‹£∫Ω¯––∂‡±ﬂ–Œœ‡ΩªÀ„∑®£¨ªÒµ√∑«¡¨Ω”µ„Ωªµ„£¨≤¢≤Â»
 		}
 	}
 }
+
 
 int Yin::postion(Point c)
 {
@@ -823,6 +826,94 @@ void Yin::resetSign()
 	sign = v1.cross(v2) < 0;
 }
 
+bool Yin::checkPad()//ºÏ≤‚ «∑Ò¡Ω¡Ωº∏∫ı≤ªΩª
+{
+	list<Line> lines;
+	int id = 1;
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		Polygon::Vertex* ii = i->head;
+		do {
+			Line l(ii->p, ii->next->p);
+			l.ID = id;
+			lines.push_back(l);
+			ii = ii->next;
+		} while (ii != i->head);
+		id++;
+	}
+	//≈–∂œ «∑Ò”–◊‘Ωªµ„ªÚproperΩªµ„
+	map<Point, PointInfo> intersections;
+	map<double, bool> tiktak;
+	findIntersection(lines, intersections);
+
+	for (auto i = intersections.begin(); i != intersections.end(); ) {
+		if (!(i->second.C.size() > 0 || i->second.U.size() + i->second.L.size() > 2)) {
+			auto j = i;
+			i++;
+			intersections.erase(j);
+		}
+		else {
+			i++;
+		}
+	}
+
+	for (auto i = intersections.begin(); i != intersections.end(); i++) {
+		list<Line> UL;
+		UL.insert(UL.begin(), i->second.U.begin(), i->second.U.end());
+		UL.insert(UL.begin(), i->second.L.begin(), i->second.L.end());
+		for (auto j = UL.begin(); j != UL.end(); j++) {
+			bool t = j->P == i->first;
+			Point v = j->Q - j->P;
+			double arg = t ? atan2(v.y, v.x) : atan2(-v.y, -v.x);
+			if (tiktak.find(arg) != tiktak.end())
+				return false;
+			tiktak[arg] = t;
+		}
+		for (auto j = i->second.C.begin(); j != i->second.C.end(); j++) {
+			Point v = j->Q - j->P;
+			double arg1 = atan2(v.y, v.x);
+			double arg2 = atan2(-v.y, -v.x);
+			if (tiktak.find(arg1) != tiktak.end() || tiktak.find(arg2) != tiktak.end())
+				return false;
+			tiktak[arg1] = true;
+			tiktak[arg2] = false;
+		}
+		//µŒ¥≤‚ ‘
+		bool status = tiktak.rbegin()->second;
+		for (auto i = tiktak.begin(); i != tiktak.end(); i++) {
+			if (i->second ^ status) {
+				status = i->second;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool Yin::checkOri()//ºÏ≤‚«˙œﬂ∂®œÚ «∑Ò∫œ∑®
+{
+	int n = spadjor.size();
+	Yin cop = *this, null;
+	cop.intersect(null);
+	for (int i = 0; i < n; i++) {
+		Polygon obj = *cop.spadjor.begin();
+		cop.spadjor.pop_front();
+		Polygon::Vertex* vp = obj.head;
+		int pos = 0;
+		do {
+			Point p = 0.5 * (vp->p + vp->next->p);
+			pos = cop.postion(p);
+			vp = vp->next;
+		} while (pos == 2);
+		if (!(obj.orientation ^ (pos == 1)))
+			return false;
+		cop.spadjor.push_back(obj);
+	}
+	return true;
+}
+
 void Yin::load(string datafiles[], int num)
 {
 	for (int i = 0; i < num; i++) {
@@ -911,6 +1002,26 @@ void Yin::InPut(string filename)
 		Jor->refreshOri();
 	}
 	resetSign();
+}
+
+bool Yin::check(string& info)
+{
+	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
+		if (!i->check()){
+			info = "One or more polygons have self intersection(s)!";
+			return false;
+		}
+	}
+	if (!checkPad()){
+		info = "There are two or more polygons with proper intersections!";
+		return false;
+	}
+	if (!checkOri()) {
+		info = "The orientation of polygons is illegal!";
+		return false;
+	}
+	info = "The object is a well-defined Yin Set.";
+	return true;
 }
 
 Yin::Yin()

@@ -12,11 +12,12 @@
 #include <iomanip>
 using namespace std;
 
+extern double err;
+
 class Point //点类
 {
 public:
 	double x, y;
-	static double err;
 
 	Point operator+(const Point rhs)const;
 	Point operator-(const Point rhs)const;
@@ -48,8 +49,6 @@ public:
 
 	bool isInside(Point c)const;
 
-	//friend void findIntersection(list<Line>& lines, map<Point, vector<Line>>& intersections);
-
 	Line();
 	Line(Point P, Point Q);
 	Line(double Px, double Py, double Qx, double Qy);
@@ -74,6 +73,8 @@ public:
 	int postion(Point c);
 	void reverse();
 	bool split(list<Polygon>& result);
+
+	bool check();
 
 	Polygon();
 	Polygon(Point* pg, int n);
@@ -100,11 +101,14 @@ public:
 	void append(Polygon PL);//添加多边形
 	void clearLabel();//清空标记点的标记
 	void resetSign();
+	bool checkPad();
+	bool checkOri();
 
 	void load(string datafiles[], int num);
 	void move(Point p);
 	void OutPut(string filename);
 	void InPut(string filename);
+	bool check(string& info);
 
 	Yin();
 	Yin(list<list<Point>>& segment);//利用线段集合生成spadjor

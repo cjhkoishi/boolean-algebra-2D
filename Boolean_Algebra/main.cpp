@@ -165,12 +165,22 @@ int main5()
 
 int main() {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Y1.InPut("Input/mickey.txt");
-	Y2.InPut("Input/panda.txt");
+	Y1.InPut("Input/panda.txt");
+	Y2.InPut("Input/mickey.txt");
 	Y1.move(Point(0,0));
 	Yin Y3 = Y1.join(Y2);
+	Yin Y4;
+	Y4.InPut("Input/err_pg.txt");
 	Y3.OutPut("res.txt");
 	drawYin(img,Y3,0);
+
+	string info;
+	Y4.check(info);
+	cout << info << endl;
+	/*cout << Y1.checkOri() << endl;
+	cout << Y2.checkOri() << endl;
+	cout << Y3.checkOri() << endl;
+	cout << Y4.checkPad() << endl;*/
 
 	cv::imshow("test", img);
 	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
