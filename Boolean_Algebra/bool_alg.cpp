@@ -236,6 +236,7 @@ bool Line::operator<(const Line rhs) const
 		if (dist != 0)
 			return dist > 0;
 	}
+	//对于重合线段进行简单区分
 	if (P == rhs.P && Q == rhs.Q)
 		return ID < rhs.ID;
 	else
@@ -897,6 +898,7 @@ void Yin::InPut(string filename)
 		if (xs.size() != ys.size())
 		{
 			spadjor.clear();
+			cout << "错误的文件格式" << endl;
 			return;
 		}
 		else if (xs.size() == 0)
@@ -906,6 +908,7 @@ void Yin::InPut(string filename)
 		for (int i = 0; i < xs.size() - 1; i++) {
 			Jor->append(Point(xs[i], ys[i]));
 		}
+		Jor->refreshOri();
 	}
 	resetSign();
 }
