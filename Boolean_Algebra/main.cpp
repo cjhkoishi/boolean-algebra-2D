@@ -165,9 +165,9 @@ int main5()
 
 int main() {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Y1.InPut("Input/two_inv_square.txt");
-	Y2.InPut("Input/imp.txt");
-	Y1.move(Point(1.0000001,0));
+	Y1.InPut("Input/mickey.txt");
+	Y2.InPut("Input/panda.txt");
+	Y1.move(Point(0,0));
 	Yin Y3 = Y1.join(Y2);
 	Y3.OutPut("res.txt");
 	drawYin(img,Y3,0);

@@ -15,6 +15,7 @@ class Point //µ„¿‡
 {
 public:
 	double x, y;
+	static double err;
 
 	Point operator+(const Point rhs)const;
 	Point operator-(const Point rhs)const;

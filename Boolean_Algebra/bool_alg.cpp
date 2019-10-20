@@ -37,7 +37,7 @@ double Point::norm()
 
 bool Point::operator<(const Point rhs) const
 {
-	return (abs(y - rhs.y)<1e-10 ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
+	return (abs(y - rhs.y) < 1e-10 ? (x > rhs.x) : (y < rhs.y)) && !(*this == rhs);
 }
 
 bool Point::operator==(const Point rhs) const
@@ -197,7 +197,7 @@ Point Line::E;
 
 bool Line::operator<(const Line rhs) const
 {
-	bool isParallel1 = P.y == Q.y;
+	/*bool isParallel1 = P.y == Q.y;
 	bool isParallel2 = rhs.P.y == rhs.Q.y;
 	double M = isParallel1 ? E.x : P.x + (Q.x - P.x) * (P.y - E.y) / (P.y - Q.y);
 	double N = isParallel2 ? E.x : rhs.P.x + (rhs.Q.x - rhs.P.x) * (rhs.P.y - E.y) / (rhs.P.y - rhs.Q.y);
@@ -215,7 +215,31 @@ bool Line::operator<(const Line rhs) const
 			return ID < rhs.ID;
 		else
 			return P < rhs.P || P == rhs.P && Q < rhs.Q;
+	}*/
+	Point v = P - Q;
+	Point w = rhs.P - rhs.Q;
+	double cm = v.cross(w);
+	if (cm != 0) {
+		double t = (rhs.P - P).cross(w) / cm;
+		Point inte = t * v + P;
+		bool vd = v < Point(0, 0);
+		bool wd = w < Point(0, 0);
+		bool less=(vd ^ wd) ^ (cm > 0);
+		if (inte == E || E < inte)
+			return less;
+		else
+			return !less;
 	}
+	else {
+		v = v < Point(0, 0) ? v : Point(0, 0) - v;
+		double dist = v.cross(rhs.P - P);
+		if (dist != 0)
+			return dist > 0;
+	}
+	if (P == rhs.P && Q == rhs.Q)
+		return ID < rhs.ID;
+	else
+		return P < rhs.P || P == rhs.P && Q < rhs.Q;
 }
 
 bool Line::operator==(const Line rhs) const
