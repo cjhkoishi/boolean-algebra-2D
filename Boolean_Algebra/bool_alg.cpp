@@ -174,24 +174,6 @@ void findNextEvent(Line L1, Line L2, Point p, map<Point, PointInfo>& Q) {
 			}
 		}
 	}
-	/*else if ((L1.P - L2.P).cross(v) == 0) {
-		bool isIn[4];
-		Point endpoint[4] = { L1.P,L1.Q,L2.P,L2.Q };
-		isIn[0] = (L1.P < L2.P ^ L1.P < L2.Q) && !(L1.P == L2.P || L1.P == L2.Q);
-		isIn[1] = (L1.Q < L2.P ^ L1.Q < L2.Q) && !(L1.Q == L2.P || L1.Q == L2.Q);
-		isIn[2] = (L2.P < L1.P ^ L2.P < L1.Q) && !(L2.P == L1.P || L2.P == L1.Q);
-		isIn[3] = (L2.Q < L1.P ^ L2.Q < L1.Q) && !(L2.Q == L1.P || L2.Q == L1.Q);
-		for (int i = 0; i < 4; i++)
-			if (isIn[i] && (endpoint[i] < p || endpoint[i] == p))
-			{
-				int tak = i / 2;
-				Line tkl = tak == 0 ? L2 : L1;
-				PointInfo& pi = Q[endpoint[i]];
-				bool CF = find(pi.C.begin(), pi.C.end(), tkl) == pi.C.end();
-				if (CF)
-					pi.C.push_back(tkl);
-			}
-	}*/
 }
 
 double mod(double a, double b)
@@ -399,7 +381,7 @@ bool Polygon::check()
 	} while (i != head);
 
 	map<Point, PointInfo> intersections;
-	findIntersection(lines,intersections);
+	findIntersection(lines, intersections);
 
 	for (auto i = intersections.begin(); i != intersections.end(); i++) {
 		if (i->second.C.size() > 0 || i->second.U.size() + i->second.L.size() > 2) {
@@ -429,23 +411,6 @@ Polygon::Polygon(Point* pg, int n)
 		}
 		j->next = head;
 		head->last = j;
-	}
-}
-
-Polygon::Polygon(string filename)
-{
-	fstream f(filename, ios::in);
-	double input;
-	vector<double> buffer;
-	while (!f.eof()) {
-		f >> input;
-		buffer.push_back(input);
-	}
-	f.close();
-	int n = (int)buffer.size() / 2;
-	for (int i = 0; i < n - 1; i++) {
-		Point p(buffer[i], buffer[n + i]);
-		append(p);
 	}
 }
 
@@ -730,7 +695,8 @@ int Yin::postion(Point c, Point d)
 		for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
 			Polygon::Vertex* j = i->head;
 			do {
-				if (c == j->p && (d - c) * (j->next->p - c) > 0)
+				Line l = Line(j->p, j->next->p);
+				if (c == l.P && (l.isInside(d) || d == l.Q) && (d - c) * (l.Q - c) > 0)
 					return 2;
 				j = j->next;
 			} while (j != i->head);
@@ -785,16 +751,6 @@ void Yin::getBettiNum(int& b0, int& b1)
 		else
 			b1++;
 	}
-}
-
-void Yin::append(Polygon PL)
-{
-	PL.refreshOri();
-	bool ori = PL.orientation;
-	if ((postion(PL.head->p) == 0) ^ ori)
-		PL.reverse();
-	PL.refreshOri();
-	spadjor.push_back(PL);
 }
 
 void Yin::clearLabel()
@@ -914,14 +870,6 @@ bool Yin::checkOri()//检测曲线定向是否合法
 	return true;
 }
 
-void Yin::load(string datafiles[], int num)
-{
-	for (int i = 0; i < num; i++) {
-		Polygon PL(datafiles[i]);
-		append(PL);
-	}
-}
-
 void Yin::move(Point p)
 {
 	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
@@ -1007,12 +955,12 @@ void Yin::InPut(string filename)
 bool Yin::check(string& info)
 {
 	for (auto i = spadjor.begin(); i != spadjor.end(); i++) {
-		if (!i->check()){
+		if (!i->check()) {
 			info = "One or more polygons have self intersection(s)!";
 			return false;
 		}
 	}
-	if (!checkPad()){
+	if (!checkPad()) {
 		info = "There are two or more polygons with proper intersections!";
 		return false;
 	}
@@ -1101,11 +1049,6 @@ Yin::Yin(list<list<Point>>& segments)
 		spadjor.insert(spadjor.end(), atom.begin(), atom.end());
 	}
 
-}
-
-Yin::Yin(string datafiles[], int num)
-{
-	load(datafiles, num);
 }
 
 Yin::~Yin()

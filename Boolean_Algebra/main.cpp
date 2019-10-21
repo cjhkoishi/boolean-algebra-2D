@@ -16,167 +16,28 @@ Yin Y1, Y2;
 
 int value1 = 1;
 
-int main3() {
-	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Polygon PL1, PL2, PL3;
-	PL1.append(Point(0, 100));
-	PL1.append(Point(100, 100));
-	PL1.append(Point(100, 200));
-	PL1.append(Point(0, 200));
-
-	PL2.append(Point(300, 0));
-	PL2.append(Point(500, 200));
-	PL2.append(Point(300, 400));
-	PL2.append(Point(100, 200));
-
-	PL3.append(Point(300, 100));
-	PL3.append(Point(200, 200));
-	PL3.append(Point(300, 300));
-	PL3.append(Point(400, 200));
-	Y1.append(PL1);
-	Y2.append(PL2);
-	Y2.append(PL3);
-
-	for (int i = 0; i < img.rows; i++) {
-		for (int j = 0; j < img.cols; j++) {
-			int r = Y2.postion(Point(j, i));
-			switch (r)
-			{
-			case 0:
-				img.at<cv::Vec3b>(i, j) += cv::Vec3b(0, 0, 0);
-				break;
-			case 1:
-				img.at<cv::Vec3b>(i, j) += cv::Vec3b(64, 64, 64);
-				break;
-			case 2:
-				img.at<cv::Vec3b>(i, j) += cv::Vec3b(0, 0, 255);
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	cv::imshow("test", img);
-	cv::waitKey(0);
-
-	return 0;
-}
-
-int main1() {
-
-	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-
-	Polygon PL1, PL2, PL3;
-	PL1.append(Point(0, 10));
-	PL1.append(Point(100, 10));
-	PL1.append(Point(100, 210));
-	PL1.append(Point(0, 210));
-
-	PL2.append(Point(100, 10));
-	PL2.append(Point(400, 10));
-	PL2.append(Point(400, 310));
-	PL2.append(Point(100, 310));
-
-	PL3.append(Point(200, 110));
-	PL3.append(Point(200, 230));
-	PL3.append(Point(300, 210));
-	PL3.append(Point(300, 110));
-	Y1.append(PL1);
-	Y2.append(PL2);
-	Y2.append(PL3);
-
-	Y1.move(Point(196, 0));
-	Yin Y3 = Y1.join(Y2);
-	//Y1.intersect(Y2);
-	drawYin(img, Y3, 0);
-
-	cv::imshow("test", img);
-	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
-	cv::waitKey(0);
-	return 0;
-}
-
-int main0() {
-
-	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-
-	Polygon PL1, PL2, PL3;
-	PL1.append(Point(0.5, 0));
-	PL1.append(Point(0.5, 0.5));
-	PL1.append(Point(1, 0.5));
-	PL1.append(Point(1, 1));
-	PL1.append(Point(0, 1));
-	PL1.append(Point(0, 0));
-
-
-	PL2.append(Point(0.5, 0));
-	PL2.append(Point(1, 0));
-	PL2.append(Point(1, 0.5));
-	PL2.append(Point(0.5, 0.5));
-
-	Y1.append(PL1);
-	Y2.append(PL2);
-
-	Yin Y3 = Y1.join(Y2);
-	//Y1.intersect(Y2);
-	drawYin(img, Y3, 0);
-
-	cv::imshow("test", img);
-	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
-	cv::waitKey(0);
-	return 0;
-}
-
-int main5()
-{
-	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	stringstream ss;
-	string s1[6], s2[10];
-	for (int i = 0; i < 6; i++) {
-		ss.str("");
-		ss << "mickeydata/Data_" << i + 1 << ".txt";
-		s1[i] = ss.str();
-	}
-	for (int i = 0; i < 10; i++) {
-		ss.str("");
-		ss << "pandadata/Data_" << i + 1 << ".txt";
-		s2[i] = ss.str();
-	}
-	Y1.load(s1, 6);
-	Y2.load(s2, 10);
-	Yin Y3 = Y1.join(Y2);
-	Yin Y4;
-	Y4.InPut("panda_inv.txt");
-	//Y1.intersect(Y2);
-	//drawYin(img, Y1, 1);
-	//drawYin(img, Y2, 1);
-
-	//drawYin(img, Y3, 0);
-	//Y1.OutPut("mickey.txt");
-	//Y2.OutPut("panda.txt");
-	drawYin(img, Y4, 1);
-
-	cv::imshow("test", img);
-	cv::createTrackbar("test1", "test", &value1, 100, slideBar);
-	cv::waitKey(0);
-	return 0;
-}
-
 int main() {
 	cv::Mat img = cv::Mat::zeros(600, 800, CV_8UC3);
-	Y1.InPut("Input/panda.txt");
 	Y2.InPut("Input/mickey.txt");
-	Y1.move(Point(0,0));
-	Yin Y3 = Y1.join(Y2);
-	Yin Y4;
-	Y4.InPut("Input/err_pg.txt");
-	Y3.OutPut("res.txt");
-	drawYin(img,Y3,0);
-
+	Y1.InPut("Input/six_hole.txt");
+	
 	string info;
-	Y4.check(info);
+	Y1.check(info);
 	cout << info << endl;
+	Y2.check(info);
+	cout << info << endl;
+
+	//Y1.move(Point(0.5, 0));
+
+	//Y1.intersect(Y2);
+	//drawYin(img, Y2, 0);
+	Yin Y3 = Y1.join(Y2);
+	Y3.OutPut("res.txt");
+	drawYin(img, Y3, 0);
+
+
+	//Y4.check(info);
+	//cout << info << endl;
 	/*cout << Y1.checkOri() << endl;
 	cout << Y2.checkOri() << endl;
 	cout << Y3.checkOri() << endl;
@@ -216,7 +77,7 @@ void drawYin(cv::Mat img, Yin& Y, int mode)
 	if (mode == 1)
 		for (int i = 0; i < img.rows; i++) {
 			for (int j = 0; j < img.cols; j++) {
-				if (Y.postion(Point(j*0.01, i*0.01)) == 1)
+				if (Y.postion(Point(j * 0.01, i * 0.01)) == 1)
 					img.at<cv::Vec3b>(i, j) += cv::Vec3b(64, 64, 64);
 			}
 		}

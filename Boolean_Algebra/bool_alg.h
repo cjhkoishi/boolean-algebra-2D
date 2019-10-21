@@ -65,7 +65,7 @@ public:
 		bool isMarked = false;//是否是分割点
 	};
 	Vertex* head = 0;//指向双向链表起始节点
-	bool orientation = false;//多边形的绕向，被动变量
+	bool orientation = false;//多边形的绕向
 
 	void append(Point c);//在head顶点之前插入一个顶点
 	void refreshOri();//计算定向并刷新变量
@@ -74,11 +74,10 @@ public:
 	void reverse();
 	bool split(list<Polygon>& result);
 
-	bool check();
+	bool check();//判断是否自交
 
 	Polygon();
 	Polygon(Point* pg, int n);
-	Polygon(string filename);
 	Polygon(const Polygon& obj);
 	~Polygon();
 };
@@ -87,7 +86,7 @@ class Yin //Yin集类
 {
 public:
 	list<Polygon> spadjor;
-	bool sign = false;
+	bool sign = false;//Yin集的符号
 	//布尔运算
 	Yin inverse();
 	Yin meet(Yin rhs);
@@ -98,13 +97,11 @@ public:
 	int postion(Point c, Point d);//0：内部 1：外部 2：包含并同向 3：包含并异向
 	void cut(list<list<Point>>& out);//利用标记点分割成折线段
 	void getBettiNum(int& b0, int& b1);//计算betti数
-	void append(Polygon PL);//添加多边形
 	void clearLabel();//清空标记点的标记
 	void resetSign();
-	bool checkPad();
-	bool checkOri();
+	bool checkPad();//判断曲线之间的几乎不交性
+	bool checkOri();//判断定向的合法性
 
-	void load(string datafiles[], int num);
 	void move(Point p);
 	void OutPut(string filename);
 	void InPut(string filename);
@@ -112,6 +109,5 @@ public:
 
 	Yin();
 	Yin(list<list<Point>>& segment);//利用线段集合生成spadjor
-	Yin(string datafiles[], int num);
 	~Yin();
 };
